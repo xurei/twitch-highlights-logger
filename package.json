@@ -1,0 +1,11 @@
+{
+  "name": "twitch-highlights-logger",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Olivier Bourdoux <olivier.bourdoux@gmail.com>",
+  "license": "MIT"
+}

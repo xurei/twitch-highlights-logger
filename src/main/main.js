@@ -74,11 +74,6 @@ const App = {
         //Unregister all shortcuts.
         //globalShortcut.unregisterAll();
         
-        //Destroy the app icon
-        if (appIcon !== null) {
-            appIcon.destroy();
-        }
-        
         app.quit();
         app.exit(0);
     },

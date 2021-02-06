@@ -64,7 +64,7 @@ module.exports = {
         "promise/no-callback-in-promise": "warn",
 
         "react/jsx-uses-vars": "error",
-        "react/jsx-no-bind": "error",
+        "react/jsx-no-bind": "warn",
         "react/prefer-es6-class": ["warn", "always"],
     
         "react-hooks/rules-of-hooks": "error",

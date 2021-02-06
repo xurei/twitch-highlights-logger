@@ -1,11 +1,6 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
-import deepEqual from 'deep-eql';
-import autobind from 'autobind-decorator';
-import { VCenter } from 'xureact';
-import ReactDOM from 'react-dom';
-import MainView from './main_view';
 
 function slidingWindow(items, windowLength) {
     const max_t = Math.round(items[items.length-1].content_offset_seconds);
@@ -133,7 +128,7 @@ class VideoView extends React.Component {
                                            this.player.seek(range.start-start_delay);
                                        }}
                                     >
-                                        {secondsToTime(range.start-start_delay) + " - " + secondsToTime(range.end-end_delay)}
+                                        {`${secondsToTime(range.start - start_delay)} - ${secondsToTime(range.end - end_delay)}`}
                                     </a>
                                 ))}
                             </div>

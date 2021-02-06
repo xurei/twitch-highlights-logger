@@ -1,14 +1,10 @@
 import { BrowserWindow } from 'electron';
 import path from 'path';
+import url from 'url';
 import releasesProvider from './providers/releases-provider';
 import semver from 'semver';
 //noinspection JSFileReferences,JSUnresolvedFunction
 const pkg = require('./package.json');
-import platform from './platform';
-
-let DIRSEP = '/';
-if (platform.isWin)
-{DIRSEP = '\\';}
 
 // Create the browser window.
 const mainWindow = new BrowserWindow({
@@ -22,15 +18,19 @@ const mainWindow = new BrowserWindow({
 });
 mainWindow.setMenu(null);
 mainWindow.setTitle('Twitch highlights');
-// and load the index.html of the app
-mainWindow.loadURL(`file://${__dirname + DIRSEP}index.html`);
-console.log(`file://${__dirname + DIRSEP}index.html`);
 
 mainWindow.on('show', function(e) {
-    mainWindow.loadURL(`file://${__dirname + DIRSEP}index.html`);
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true,
+    }))
+    .catch(e => {
+        console.error(e);
+    });
     releasesProvider.loadLatestRelease()
     .then((release) => {
-        if (!!release) {
+        if (release) {
             console.log(`Latest release: ${release.tag_name} vs ${pkg.version}`);
             if (semver.gt(release.tag_name.substring(1), pkg.version)) {
                 release.new_version = true;

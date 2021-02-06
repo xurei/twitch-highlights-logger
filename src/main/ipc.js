@@ -1,8 +1,6 @@
 const ipc = require('electron').ipcMain;
-const { globalShortcut, shell } = require('electron');
-const path = require('path');
 const twitchChatProvider = require('./providers/twitch-chat-provider');
-const debug = require('debug')('hyperkeys-ipc');
+const debug = require('debug')('twitch-highlights-ipc');
 
 module.exports = {
     start: function(app) {

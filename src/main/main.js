@@ -1,7 +1,6 @@
 import { app, session } from 'electron';
-const debug = require('debug')('hyperkeys-app');
+const debug = require('debug')('twitch-highlights-app');
 import ipcService from './ipc';
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import platform from './platform';
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -22,8 +21,6 @@ let mainWindow = null;
 
 const App = {
     ready: () => {
-        mainWindow = require('./main-window');
-        
         session.defaultSession.webRequest.onHeadersReceived((details, done) => {
             //console.log('onHeadersReceived');
             //console.log(details.url, JSON.stringify(details.responseHeaders, null, '  '));
@@ -35,25 +32,17 @@ const App = {
             });
         });
         
-        if (process.env['NODE_ENV'] === 'development') {
-            installExtension(REACT_DEVELOPER_TOOLS)
-            .then((name) => console.log(`Added Extension:  ${name}`))
-            .catch((err) => console.log('An error occurred: ', err));
-        }
-        
         ipcService.start(app);
         //mainWindow.toggleDevTools();
         
         function toggleWindow() {
             mainWindow.show();
         }
-        
+    
+        mainWindow = require('./main-window');
         Promise.resolve()
         //.then(() => checkTrayCompatibility())
         .then(() => {
-            if (platform.isWin || platform.isLinux) {
-                console.log(`${APPPATH + DIRSEP}300x300.png`);
-            }
             mainWindow.show();
             return;
         })

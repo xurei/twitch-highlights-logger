@@ -146,6 +146,12 @@ VideoView = Styled(VideoView)`
   height: 100%;
   position: relative;
   
+  #main-player {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
   .highlight_range {
     display: block;
     line-height: 1.3em;

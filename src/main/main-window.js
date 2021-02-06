@@ -27,14 +27,17 @@ mainWindow.loadURL(`file://${__dirname + DIRSEP}index.html`);
 console.log(`file://${__dirname + DIRSEP}index.html`);
 
 mainWindow.on('show', function(e) {
+    mainWindow.loadURL(`file://${__dirname + DIRSEP}index.html`);
     releasesProvider.loadLatestRelease()
     .then((release) => {
-        console.log(`Latest release: ${release.tag_name} vs ${pkg.version}`);
-        if (semver.gt(release.tag_name.substring(1), pkg.version)) {
-            release.new_version = true;
-            console.log(`NEW VERSION ${release.tag_name}`);
+        if (!!release) {
+            console.log(`Latest release: ${release.tag_name} vs ${pkg.version}`);
+            if (semver.gt(release.tag_name.substring(1), pkg.version)) {
+                release.new_version = true;
+                console.log(`NEW VERSION ${release.tag_name}`);
+            }
+            mainWindow.webContents.send('latest_version', release);
         }
-        mainWindow.webContents.send('latest_version', release);
         return;
     })
     .catch(e => {

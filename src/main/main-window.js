@@ -19,7 +19,6 @@ mainWindow.setMenu(null);
 mainWindow.setTitle('Twitch highlights');
 // and load the index.html of the app
 mainWindow.loadURL(`file://${  __dirname  }/index.html`);
-mainWindow.toggleDevTools();
 
 mainWindow.on('show', function(e) {
     releasesProvider.loadLatestRelease()

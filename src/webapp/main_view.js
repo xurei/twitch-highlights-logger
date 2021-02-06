@@ -56,7 +56,7 @@ class MainView extends React.Component {
                                 </div>
                             </FlexChild>
                             <FlexChild grow={0} width={64}>
-                                <div style={{paddingRight: 5, paddingLeft: 5, paddingTop: 10, background: '#282828'}}>
+                                <div style={{paddingRight: 5, paddingLeft: 5, paddingTop: 10, background: '#282828', lineHeight: 0 }}>
                                     <img src="300x300.png" alt="Logo"/>
                                 </div>
                             </FlexChild>

@@ -42,7 +42,7 @@ const App = {
         }
         
         ipcService.start(app);
-        mainWindow.toggleDevTools();
+        //mainWindow.toggleDevTools();
         
         function toggleWindow() {
             mainWindow.show();

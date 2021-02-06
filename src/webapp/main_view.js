@@ -16,12 +16,10 @@ class MainView extends React.Component {
         const state = this.state;
         
         let video_id = state.twitch_url;
-        console.log(video_id);
         if (!!video_id && video_id.match(/twitch.tv/)) {
             video_id = video_id.split('/');
             video_id = video_id[video_id.length-1];
         }
-        console.log(video_id);
         
         return (
             <div className={props.className}>

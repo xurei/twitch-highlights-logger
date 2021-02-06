@@ -4,6 +4,11 @@ import releasesProvider from './providers/releases-provider';
 import semver from 'semver';
 //noinspection JSFileReferences,JSUnresolvedFunction
 const pkg = require('./package.json');
+import platform from './platform';
+
+let DIRSEP = '/';
+if (platform.isWin)
+{DIRSEP = '\\';}
 
 // Create the browser window.
 const mainWindow = new BrowserWindow({
@@ -18,7 +23,8 @@ const mainWindow = new BrowserWindow({
 mainWindow.setMenu(null);
 mainWindow.setTitle('Twitch highlights');
 // and load the index.html of the app
-mainWindow.loadURL(`file://${  __dirname  }/index.html`);
+mainWindow.loadURL(`file://${__dirname + DIRSEP}index.html`);
+console.log(`file://${__dirname + DIRSEP}index.html`);
 
 mainWindow.on('show', function(e) {
     releasesProvider.loadLatestRelease()

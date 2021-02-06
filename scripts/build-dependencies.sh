@@ -14,6 +14,6 @@ cd $BASEPATH/../build
 npm install
 
 # Node rebuild
-npm rebuild --runtime=electron --target=11.2.3 --disturl=https://atom.io/download/atom-shell --abi=$(../node_modules/.bin/electron -a)
+npm rebuild --runtime=electron --target=10.3.1 --disturl=https://atom.io/download/atom-shell --abi=$(../node_modules/.bin/electron -a)
 
 cd $BASEPATH/..

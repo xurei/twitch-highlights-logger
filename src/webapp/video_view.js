@@ -128,9 +128,13 @@ class VideoView extends React.Component {
                         ) : (
                             <div>
                                 {state.ranges.map(range => (
-                                    <a href="javascript:" className={`highlight_range ${range.start-start_delay <= state.time && state.time <= range.end+end_delay ? 'active':''}`} onClick={() => {
-                                        this.player.seek(range.start-start_delay);
-                                    }}>{secondsToTime(range.start-start_delay) + " - " + secondsToTime(range.end+end_delay)}</a>
+                                    <a key={range.start} href="javascript:" className={`highlight_range ${range.start-start_delay <= state.time && state.time <= range.end-end_delay ? 'active':''}`}
+                                       onClick={() => {
+                                           this.player.seek(range.start-start_delay);
+                                       }}
+                                    >
+                                        {secondsToTime(range.start-start_delay) + " - " + secondsToTime(range.end-end_delay)}
+                                    </a>
                                 ))}
                             </div>
                         )}

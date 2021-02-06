@@ -1,0 +1,249 @@
+<html lang="en">
+<body>
+    <script src="https://player.twitch.tv/js/embed/v1.js"></script>
+
+    <div id="content"></div>
+
+<!--    <div id="select_url_view">-->
+<!--        <div style="height: 75%">-->
+<!--            <div class="vcenter">-->
+<!--                <div class="vcenter_content">-->
+<!--                    <p style="">Enter Twitch URL:</p>-->
+<!--                    <input type="text" id="video_url" placeholder="https://www.twitch.tv/videos/XXXXXXXXX">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+<!--    <div id="video_view">-->
+<!--        <div class="flex-main">-->
+<!--            <div class="flew-child" style="width: 85%; flex-grow: 1;">-->
+<!--                <div id="main-player"></div>-->
+<!--            </div>-->
+<!--            <div class="sidebar" style="width: 200px; flex-grow: 0;">-->
+<!--                <div id="links"></div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+</body>
+<script type="text/javascript">
+    /*var $select_url_view = document.getElementById('select_url_view');
+    var $video_view = document.getElementById('video_view');
+
+    $select_url_view.classList.add('active');
+
+    var ranges = [
+        {
+            "start": 347,
+            "end": 361
+        },
+        {
+            "start": 374,
+            "end": 379
+        },
+        {
+            "start": 391,
+            "end": 393
+        },
+        {
+            "start": 395,
+            "end": 402
+        },
+        {
+            "start": 1515,
+            "end": 1651
+        },
+        {
+            "start": 1862,
+            "end": 1864
+        },
+        {
+            "start": 1867,
+            "end": 1877
+        },
+        {
+            "start": 1883,
+            "end": 1966
+        },
+        {
+            "start": 2122,
+            "end": 2241
+        },
+        {
+            "start": 2392,
+            "end": 2465
+        },
+        {
+            "start": 2671,
+            "end": 2685
+        },
+        {
+            "start": 2716,
+            "end": 2730
+        },
+        {
+            "start": 2736,
+            "end": 2754
+        },
+        {
+            "start": 3331,
+            "end": 3481
+        },
+        {
+            "start": 3483,
+            "end": 3486
+        },
+        {
+            "start": 3524,
+            "end": 3526
+        },
+        {
+            "start": 3531,
+            "end": 3534
+        },
+        {
+            "start": 3546,
+            "end": 3695
+        },
+        {
+            "start": 3698,
+            "end": 3707
+        },
+        {
+            "start": 3935,
+            "end": 3951
+        },
+        {
+            "start": 3977,
+            "end": 3977
+        },
+        {
+            "start": 3982,
+            "end": 4101
+        },
+        {
+            "start": 4112,
+            "end": 4117
+        },
+        {
+            "start": 4732,
+            "end": 4792
+        },
+        {
+            "start": 4907,
+            "end": 5042
+        },
+        {
+            "start": 5177,
+            "end": 5179
+        },
+        {
+            "start": 5184,
+            "end": 5286
+        },
+        {
+            "start": 5654,
+            "end": 5654
+        },
+        {
+            "start": 5662,
+            "end": 5669
+        },
+        {
+            "start": 5673,
+            "end": 5742
+        },
+        {
+            "start": 5965,
+            "end": 5983
+        },
+        {
+            "start": 6002,
+            "end": 6023
+        },
+        {
+            "start": 6111,
+            "end": 6219
+        },
+        {
+            "start": 6421,
+            "end": 6489
+        },
+        {
+            "start": 9539,
+            "end": 9539
+        },
+        {
+            "start": 9549,
+            "end": 9570
+        },
+        {
+            "start": 9578,
+            "end": 9580
+        }
+    ];
+
+    var options = {
+        width: '100%',
+        height: '100%',
+        autoplay: true,
+        muted: true,
+        //channel: "copainduweb",
+        video: "887541737",
+        //collection: "<collection ID>",
+        // only needed if your site is also embedded on embed.example.com and othersite.example.com
+        parent: [ 'localhost' ]
+    };
+    var player = new Twitch.Player("main-player", options);
+    player.setVolume(0.5);
+    setTimeout(() => {
+        player.setMuted(false);
+    }, 2000);
+
+    function secondsToTime(t) {
+        var seconds = (t%60);
+        t -= seconds;
+        t /= 60;
+        var minutes = (t%60);
+        t -= minutes;
+        t /= 60;
+        var hours = t;
+        return `${hours}:${(minutes < 10 ? '0' : '') + minutes}:${(seconds < 10 ? '0' : '') + seconds}`
+    }
+
+    const $links = document.getElementById('links');
+    ranges.forEach(range => {
+        const link = document.createElement('A');
+        link.innerHTML = secondsToTime(range.start-10) + " - " + secondsToTime(range.end-10);
+        link.href = 'javascript:;';
+        link.style.display = 'block';
+        link.addEventListener('click', () => {
+            player.seek(range.start-10);
+        });
+        $links.appendChild(link);
+    });*/
+</script>
+
+<script>
+    if (typeof(window.require) !== 'undefined') {
+        window.requireNode = window.require;
+        window.require = undefined;
+        window.ipc = requireNode('electron').ipcRenderer;
+    }
+    else {
+        window.ipc = {
+            send: function () {},
+            on: function () {}
+        };
+    }
+
+    document.addEventListener("keydown", function (e) {
+        if (e.which === 123) { // F12
+            ipc.send('devtools', null);
+        } else if (e.which === 116) { // F5
+            location.reload();
+        }
+    });
+</script>
+<script src="webapp.js"></script>
+</html>

@@ -75,10 +75,7 @@ const config = {
     plugins: [
         new webpack.DefinePlugin({
             'process.env': {
-                HYPERKEYS_DEV_ENV: process.env.HYPERKEYS_DEV_ENV,
                 BROWSER: true,
-                HYPERKEYS_API_DOMAIN: process.env.HYPERKEYS_API_DOMAIN ? `"${process.env.HYPERKEYS_API_DOMAIN}"` : undefined,
-                HYPERKEYS_ENABLE_MOCKS: process.env.HYPERKEYS_ENABLE_MOCKS,
                 NODE_ENV: `"${NODE_ENV}"`,
             },
             //FIXME this disables entirely the React Devtool, cannot stay like this
@@ -86,7 +83,7 @@ const config = {
         }),
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new HtmlWebpackPlugin({
-            title: 'HyperKeys',
+            title: 'Twitch Highlights',
             hash: true,
             template: path.resolve(__dirname, 'src', 'webapp', 'index.html'),
             loader: 'lodash-loader',

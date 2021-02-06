@@ -25,7 +25,7 @@ class MainView extends React.Component {
             <div className={props.className}>
                 {props.release && props.release.new_version && (
                     <div className="new-version">
-                        <strong>A new version of Hyperkeys is available !</strong>
+                        <strong>A new version of Twitch Highlights is available !</strong>
                         {' '}
                         {props.release && props.release.tag_name}
                         {' '}

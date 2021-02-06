@@ -9,7 +9,7 @@ const provider = {
                 method: 'GET',
                 headers: {
                     Accept: 'application/vnd.github.v3+json',
-                    'User-Agent': 'Hyperkeys-App',
+                    'User-Agent': 'Twitch-Highlights-App',
                 },
             })
             .then(res => res.json())

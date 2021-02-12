@@ -10,7 +10,7 @@ function slidingWindow(items, windowLength) {
         item = {...item};
         item.content_offset_seconds = Math.round(item.content_offset_seconds);
         return item;
-    })
+    });
     const out = new Array(max_t+windowLength).fill(0);
     items.forEach(item => {
         for (let t2=0; t2<windowLength;++t2) {
@@ -45,6 +45,7 @@ class VideoView extends React.Component {
         filterMatchingCount: 0,
         filterThreshold: 15,
         windowLength: 120,
+        rollback: 20,
     };
     videoInterval = null;
     
@@ -71,11 +72,13 @@ class VideoView extends React.Component {
         const lastFilter = LocalStorage.get('LAST_FILTER_USED', 'copainLUL');
         const lastThreshold = LocalStorage.get('LAST_THRESHOLD_USED', 3);
         const lastWindowLength = LocalStorage.get('LAST_WINDOW_LENGTH', 120);
+        const lastRollback = LocalStorage.get('LAST_ROLLBACK', 20);
         this.setState(state => ({
             ...state,
             filterValue: lastFilter,
             filterThreshold: lastThreshold,
             windowLength: lastWindowLength,
+            rollback: lastRollback,
         }));
         
         global.ipc.on('chatlog', (event, chatlog) => {
@@ -95,6 +98,7 @@ class VideoView extends React.Component {
         if (state.chatlog_ready) {
             if (prevState.filterValue !== state.filterValue
             ||  prevState.filterThreshold !== state.filterThreshold
+            //||  prevState.rollback !== state.rollback
             ||  prevState.windowLength !== state.windowLength) {
                 this.applyFilter();
             }
@@ -168,8 +172,8 @@ class VideoView extends React.Component {
     render() {
         const props = this.props;
         const state = this.state;
-        const start_delay = 10;
-        const end_delay = 10;
+        const start_delay = state.rollback;
+        const end_delay = state.rollback;
         const ranges = state.ranges || [];
         
         let playbackShown = false;
@@ -234,7 +238,7 @@ class VideoView extends React.Component {
                                                 this.setState(state => ({
                                                     ...state,
                                                     filterThreshold: Math.max(1, parseInt(val)),
-                                                }))
+                                                }));
                                             }} />
                                         </div>
                                     </FlexChild>
@@ -251,7 +255,26 @@ class VideoView extends React.Component {
                                                 this.setState(state => ({
                                                     ...state,
                                                     windowLength: Math.max(10, parseInt(val)),
-                                                }))
+                                                }));
+                                            }} />
+                                        </div>
+                                    </FlexChild>
+                                </FlexLayout>
+                            </div>
+                            <div>
+                                <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
+                                    <FlexChild>Rollback:&nbsp;</FlexChild>
+                                    <FlexChild grow={1}>
+                                        <div className="input-seconds" style={{position: 'absolute', width: '100%'}}>
+                                            <input type="number" value={state.rollback} onChange={(e) => {
+                                                e.preventDefault();
+                                                const val = e.currentTarget.value;
+                                                const rollback = Math.max(0, parseInt(val));
+                                                this.setState(state => ({
+                                                    ...state,
+                                                    rollback: rollback,
+                                                }));
+                                                LocalStorage.set('LAST_ROLLBACK', rollback);
                                             }} />
                                         </div>
                                     </FlexChild>

@@ -177,7 +177,7 @@ class VideoView extends React.Component {
         ranges.forEach(range => {
             const rstart = Math.max(0, range.start - start_delay);
             const rend = Math.max(rstart, range.end - end_delay);
-            let isRangePlaying = (rstart <= state.time && state.time <= rend);
+            const isRangePlaying = (rstart <= state.time && state.time <= rend);
             if (!playbackShown && state.time < rstart) {
                 playbackShown = true;
                 rangeWidgets.push(this.renderPlayback());

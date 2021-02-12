@@ -2,6 +2,11 @@ $main-color: #ef8ae3;
 $main-color-dark: #d56cc9;
 $main-color-darker: #a8529f;
 
+html, body {
+  height: 100vh;
+  overflow-y: hidden;
+}
+
 body {
   margin: 0;
   background: #333;
@@ -27,11 +32,6 @@ a:hover {
   background: #333;
   height: 100%;
   overflow: hidden;
-}
-.sidebar {
-  padding: 10px;
-  overflow-y: scroll;
-  height: 100%;
 }
 #links {
   line-height: 1.25em;
@@ -86,4 +86,17 @@ button {
       box-shadow: none;
     }
   }
+}
+
+.text-right {
+  text-align: right;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  opacity: 1;
 }

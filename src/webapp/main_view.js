@@ -77,7 +77,18 @@ class MainView extends React.Component {
                         )}
                     </div>
                     <div className="footer">
-                        Version: {pkg.version}
+                        <FlexLayout direction="row">
+                            <FlexChild grow={0} width={350}>
+                                <div className="text-right overflow-hidden">
+                                    https://github.com/xurei/twitch-highlights-logger
+                                </div>
+                            </FlexChild>
+                            <FlexChild grow={1} width={10}>
+                            </FlexChild>
+                            <FlexChild grow={0} width={120}>
+                                Version: {pkg.version}
+                            </FlexChild>
+                        </FlexLayout>
                     </div>
                 </div>
             </div>
@@ -95,7 +106,8 @@ MainView = Styled(MainView)`
     padding: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100vh;
+    position: relative;
   }
   
   .header {
@@ -123,7 +135,9 @@ MainView = Styled(MainView)`
   }
   
   .content {
+    flex-shrink: 1;
     flex-grow: 1;
+    height: 1px;
     position: relative;
   }
   

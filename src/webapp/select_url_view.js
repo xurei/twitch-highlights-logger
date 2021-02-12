@@ -1,9 +1,8 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
-import deepEqual from 'deep-eql';
-import autobind from 'autobind-decorator';
 import { VCenter } from 'xureact';
+import { LocalStorage } from './local_storage';
 
 class SelectUrlView extends React.Component {
     static propTypes = {
@@ -11,6 +10,12 @@ class SelectUrlView extends React.Component {
     };
     state = {
         url: '',
+    }
+    
+    constructor(props) {
+        super(props);
+        const lastUrlUsed = LocalStorage.get('LAST_URL_USED', '');
+        this.state.url = lastUrlUsed;
     }
     
     render() {
@@ -29,7 +34,10 @@ class SelectUrlView extends React.Component {
                         }));
                     }}/>
                     <br/>
-                    <button className="cta" onClick={() => { props.onSelectUrl(state.url) }}>Open</button>
+                    <button className="cta" onClick={() => {
+                        LocalStorage.set('LAST_URL_USED', state.url);
+                        props.onSelectUrl(state.url);
+                    }}>Open</button>
                 </VCenter>
             </div>
         );

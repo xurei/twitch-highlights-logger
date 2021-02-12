@@ -74,6 +74,7 @@
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "sass-loader": "^8.0.2",
+    "store": "^2.0.12",
     "style-loader": "^2.0.0",
     "styled-components": "^5.2.1",
     "webpack": "^4.46.0",

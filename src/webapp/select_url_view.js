@@ -36,7 +36,7 @@ class SelectUrlView extends React.Component {
                     <br/>
                     <button className="cta" onClick={() => {
                         LocalStorage.set('LAST_URL_USED', state.url);
-                        props.onSelectUrl(state.url);
+                        props.onSelectUrl(state.url.split('?')[0].split('&')[0]);
                     }}>Open</button>
                 </VCenter>
             </div>

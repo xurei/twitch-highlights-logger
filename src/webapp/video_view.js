@@ -5,19 +5,22 @@ import { LocalStorage } from './local_storage';
 import { FlexLayout, FlexChild} from 'xureact/lib/cjs/components/layout/flex-layout';
 
 function slidingWindow(items, windowLength) {
-    const max_t = Math.round(items[items.length-1].content_offset_seconds);
-    items = items.map(item => {
-        item = {...item};
-        item.content_offset_seconds = Math.round(item.content_offset_seconds);
-        return item;
-    });
-    const out = new Array(max_t+windowLength).fill(0);
-    items.forEach(item => {
-        for (let t2=0; t2<windowLength;++t2) {
-            out[item.content_offset_seconds + t2]++;
-        }
-    });
-    return out;
+    if (items.length > 0) {
+        const max_t = Math.round(items[items.length-1].content_offset_seconds);
+        items = items.map(item => {
+            item = {...item};
+            item.content_offset_seconds = Math.round(item.content_offset_seconds);
+            return item;
+        });
+        const out = new Array(max_t+windowLength).fill(0);
+        items.forEach(item => {
+            for (let t2=0; t2<windowLength;++t2) {
+                out[item.content_offset_seconds + t2]++;
+            }
+        });
+        return out;
+    }
+    return [];
 }
 
 function secondsToTime(t) {

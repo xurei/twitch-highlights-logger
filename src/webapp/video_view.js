@@ -45,6 +45,7 @@ class VideoView extends React.Component {
         ranges: null,
         time: 0,
         filterValue: '',
+        userValue: '',
         filterMatchingCount: 0,
         filterThreshold: 15,
         windowLength: 120,
@@ -100,6 +101,7 @@ class VideoView extends React.Component {
         const state = this.state;
         if (state.chatlog_ready) {
             if (prevState.filterValue !== state.filterValue
+            ||  prevState.userValue !== state.userValue
             ||  prevState.filterThreshold !== state.filterThreshold
             //||  prevState.rollback !== state.rollback
             ||  prevState.windowLength !== state.windowLength) {
@@ -120,8 +122,12 @@ class VideoView extends React.Component {
                 return false;
             }
             else {
-                const msg = chatline.message.body;
-                return (!state.filterValue || state.filterValue === '' || msg.indexOf(state.filterValue) !== -1);
+                const msg = chatline.message.body.toLowerCase();
+                const user = chatline.commenter.display_name.toLowerCase();
+                return (
+                   (!state.filterValue || state.filterValue === '' || msg.indexOf(state.filterValue.toLowerCase()) !== -1)
+                && (!state.userValue || state.userValue === '' || user.indexOf(state.userValue.toLowerCase()) !== -1)
+                );
             }
         });
         console.log('Filtered chatlog', chatlog);
@@ -227,6 +233,17 @@ class VideoView extends React.Component {
                                     this.setState(state => ({
                                         ...state,
                                         filterValue: val,
+                                    }))
+                                }}/>
+                            </div>
+                            <div>
+                                User:
+                                <input type="text" value={state.userValue} placeholder="all" onChange={(e) => {
+                                    e.preventDefault();
+                                    const val = e.currentTarget.value;
+                                    this.setState(state => ({
+                                        ...state,
+                                        userValue: val,
                                     }))
                                 }}/>
                             </div>

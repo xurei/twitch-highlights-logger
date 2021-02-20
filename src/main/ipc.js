@@ -1,4 +1,5 @@
 const ipc = require('electron').ipcMain;
+const shell = require('electron').shell;
 const twitchChatProvider = require('./providers/twitch-chat-provider');
 const debug = require('debug')('twitch-highlights-ipc');
 
@@ -19,7 +20,11 @@ module.exports = {
             })
             .catch(e => {
                 console.error(e);
-            })
+            });
+        });
+    
+        ipc.on('github_page', function(/*event, arg*/) {
+            shell.openExternal('https://github.com/xurei/twitch-highlights-logger');
         });
     
         ipc.on('close', function(/*event, arg*/) {

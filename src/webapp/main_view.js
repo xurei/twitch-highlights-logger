@@ -79,14 +79,18 @@ class MainView extends React.Component {
                     <div className="footer">
                         <FlexLayout direction="row">
                             <FlexChild grow={0} width={350}>
-                                <div className="text-right overflow-hidden">
+                                <div className="overflow-hidden clickable" onClick={() => {
+                                    global.ipc.send('github_page');
+                                }}>
                                     https://github.com/xurei/twitch-highlights-logger
                                 </div>
                             </FlexChild>
                             <FlexChild grow={1} width={10}>
                             </FlexChild>
                             <FlexChild grow={0} width={120}>
-                                Version: {pkg.version}
+                                <div className="text-right">
+                                    Version: {pkg.version}
+                                </div>
                             </FlexChild>
                         </FlexLayout>
                     </div>

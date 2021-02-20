@@ -40,14 +40,9 @@ const App = {
         }
     
         mainWindow = require('./main-window');
-        Promise.resolve()
-        //.then(() => checkTrayCompatibility())
-        .then(() => {
+        mainWindow.once('ready-to-show', () => {
+            console.log('Ready to show');
             mainWindow.show();
-            return;
-        })
-        .catch(e => {
-            console.error(e);
         });
         
         //TODO remove this toggleWindow()

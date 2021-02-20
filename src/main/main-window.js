@@ -1,6 +1,5 @@
 import { BrowserWindow } from 'electron';
 import path from 'path';
-import url from 'url';
 import releasesProvider from './providers/releases-provider';
 import semver from 'semver';
 //noinspection JSFileReferences,JSUnresolvedFunction
@@ -19,15 +18,12 @@ const mainWindow = new BrowserWindow({
 mainWindow.setMenu(null);
 mainWindow.setTitle('Twitch highlights');
 
+mainWindow.loadURL(new URL(`file://${path.join(__dirname, 'index.html')}`).toString())
+.catch(e => {
+    console.error(e);
+});
+
 mainWindow.on('show', function(e) {
-    mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file:',
-        slashes: true,
-    }))
-    .catch(e => {
-        console.error(e);
-    });
     releasesProvider.loadLatestRelease()
     .then((release) => {
         if (release) {
@@ -44,13 +40,5 @@ mainWindow.on('show', function(e) {
         console.error(e);
     });
 });
-
-// Emitted when the window is closed.
-/*mainWindow.on('close', function(e) {
-    if (mainWindow !== null) {
-        e.preventDefault();
-        mainWindow.hide();
-    }
-});*/
 
 module.exports = mainWindow;

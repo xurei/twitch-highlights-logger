@@ -201,7 +201,10 @@ class VideoView extends React.Component {
             rangeWidgets.push(
                 <a key={range.start} href="javascript:" className={`highlight_range ${isRangePlaying ? 'active' : ''}`}
                    onClick={() => {
-                       this.player.seek(rstart);
+                       this.player.play();
+                       setTimeout(() => {
+                           this.player.seek(rstart);
+                       }, 50);
                    }}
                 >
                     <span className={`playback-state`}>▶</span>

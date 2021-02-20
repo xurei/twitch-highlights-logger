@@ -4,7 +4,7 @@
             "modules": "commonjs",
             "useBuiltIns": false,
             "targets": {
-                "node": true
+                "electron": "11"
             }
         }],
         "@babel/preset-react"

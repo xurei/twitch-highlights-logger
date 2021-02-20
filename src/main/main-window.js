@@ -1,4 +1,4 @@
-import { BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import path from 'path';
 
 // Create the browser window.
@@ -22,5 +22,11 @@ setTimeout(() => {
 mainWindow.on('unresponsive', () => {
     console.log('Window is unresponsive');
 } );
+
+mainWindow.on('close', function() {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
 
 module.exports = mainWindow;

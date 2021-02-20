@@ -239,7 +239,7 @@ class VideoView extends React.Component {
                                     }))
                                 }}/>
                             </div>
-                            <div>
+                            {/*<div>
                                 User:
                                 <input type="text" value={state.userValue} placeholder="all" onChange={(e) => {
                                     e.preventDefault();
@@ -247,9 +247,9 @@ class VideoView extends React.Component {
                                     this.setState(state => ({
                                         ...state,
                                         userValue: val,
-                                    }))
+                                    }));
                                 }}/>
-                            </div>
+                            </div>*/}
                             <div>
                                 <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
                                     <FlexChild>Threshold:&nbsp;</FlexChild>

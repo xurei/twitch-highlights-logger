@@ -26,6 +26,28 @@ const App = {
             //console.log(details.url, JSON.stringify(details.responseHeaders, null, '  '));
             delete details.responseHeaders['X-XSS-Protection'];
             delete details.responseHeaders['Content-Security-Policy'];
+            
+            // TODO we should have a safer way to check this. But it is not working and is prone to breaking in the future...
+            /*details.responseHeaders['Content-Security-Policy'] = [
+                'script-src \'self\'',
+                '\'unsafe-inline\'',
+                '*.imrworldwide.com',
+                '*.twitch.tv',
+                '*.cloudfront.net',
+                '*.twitchcdn.net',
+                '*.ttvnw.net',
+                'devtools: \'unsafe-eval\'',
+    
+                ';',
+                'worker-src \'self\'',
+                '\'unsafe-inline\'',
+                '*.imrworldwide.com',
+                '*.twitch.tv',
+                '*.cloudfront.net',
+                '*.twitchcdn.net',
+                '*.ttvnw.net',
+                'devtools: \'unsafe-eval\'',
+            ].join(' ');*/
             done({
                 cancel: false,
                 responseHeaders: details.responseHeaders,

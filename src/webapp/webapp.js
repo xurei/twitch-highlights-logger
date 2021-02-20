@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom';
 import './assets/style.scss';
 import MainView from './main_view';
 
+window.global = window; //eslint-disable-line no-undef
 const document = window.document; //eslint-disable-line no-undef
 
-global.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', function() { //eslint-disable-line no-undef
     ReactDOM.render(
         <MainView/>,
         document.getElementById('content'),

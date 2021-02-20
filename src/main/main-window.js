@@ -10,24 +10,25 @@ const pkg = require('./package.json');
 const mainWindow = new BrowserWindow({
     width: 1024,
     height: 768,
+    sandbox: true,
     show: false,
     icon: path.join(__dirname, '300x300.png'),
     webPreferences: {
-        nodeIntegration: true,
+        preload: path.join(__dirname, 'preload.js'),
+        contextIsolation: true,
     },
 });
 mainWindow.setMenu(null);
 mainWindow.setTitle('Twitch highlights');
+mainWindow.toggleDevTools();
+
+const indexUrl = url.pathToFileURL(path.join(__dirname, 'index.html')).toString();
+mainWindow.loadURL(indexUrl)
+.catch(e => {
+    console.error(e);
+});
 
 mainWindow.on('show', function(e) {
-    mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file:',
-        slashes: true,
-    }))
-    .catch(e => {
-        console.error(e);
-    });
     releasesProvider.loadLatestRelease()
     .then((release) => {
         if (release) {
@@ -44,13 +45,5 @@ mainWindow.on('show', function(e) {
         console.error(e);
     });
 });
-
-// Emitted when the window is closed.
-/*mainWindow.on('close', function(e) {
-    if (mainWindow !== null) {
-        e.preventDefault();
-        mainWindow.hide();
-    }
-});*/
 
 module.exports = mainWindow;

@@ -35,10 +35,6 @@ const App = {
         ipcService.start(app);
         //mainWindow.toggleDevTools();
         
-        function toggleWindow() {
-            mainWindow.show();
-        }
-    
         mainWindow = require('./main-window');
         Promise.resolve()
         //.then(() => checkTrayCompatibility())

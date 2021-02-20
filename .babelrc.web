@@ -4,7 +4,7 @@
             "modules": "commonjs",
             "useBuiltIns": false,
             "targets": {
-                "electron": "11"
+                "chrome": "80"
             }
         }],
         "@babel/preset-react"

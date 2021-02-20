@@ -1,9 +1,5 @@
-import { BrowserWindow } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import path from 'path';
-import releasesProvider from './providers/releases-provider';
-import semver from 'semver';
-//noinspection JSFileReferences,JSUnresolvedFunction
-const pkg = require('./package.json');
 
 // Create the browser window.
 const mainWindow = new BrowserWindow({
@@ -13,33 +9,24 @@ const mainWindow = new BrowserWindow({
     show: false,
     icon: path.join(__dirname, '300x300.png'),
     webPreferences: {
-        nodeIntegration: true,
+        preload: path.join(__dirname, 'preload.js'),
+        contextIsolation: true,
     },
 });
 mainWindow.setMenu(null);
-mainWindow.setTitle('Twitch highlights');
+mainWindow.setTitle('Twitch Highlights');
+setTimeout(() => {
+    mainWindow.loadFile('index.html');
+}, 100);
 
-mainWindow.loadURL(new URL(`file://${path.join(__dirname, 'index.html')}`).toString())
-.catch(e => {
-    console.error(e);
-});
+mainWindow.on('unresponsive', () => {
+    console.log('Window is unresponsive');
+} );
 
-mainWindow.on('show', function(e) {
-    releasesProvider.loadLatestRelease()
-    .then((release) => {
-        if (release) {
-            console.log(`Latest release: ${release.tag_name} vs ${pkg.version}`);
-            if (semver.gt(release.tag_name.substring(1), pkg.version)) {
-                release.new_version = true;
-                console.log(`NEW VERSION ${release.tag_name}`);
-            }
-            mainWindow.webContents.send('latest_version', release);
-        }
-        return;
-    })
-    .catch(e => {
-        console.error(e);
-    });
+mainWindow.on('close', function() {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 });
 
 module.exports = mainWindow;

@@ -4,25 +4,18 @@
     <meta charset="utf-8">
     <title>Twitch Highlights</title>
 </head>
-<body>
+<body style="margin: 0">
 <script src="natives/twitch_embed_v1.js"></script>
-<div id="content">LOADING...</div>
+<div id="loader" style="position: absolute; width: 100vw; height: 100vh; z-index: 10; transition: opacity 0.3s ease-in; opacity: 1.0; pointer-events: none">
+    <div style="text-align: center; display: flex; justify-content: center; flex-direction: column; height: 100vh; align-items: center; background: #333">
+        <img src="300x300.png" width="150" style="border-radius: 300px" alt="">
+    </div>
+</div>
+<div id="content"></div>
 <script>
-    if (typeof(window.require) !== 'undefined') {
-        window.requireNode = window.require;
-        window.require = undefined;
-        window.ipc = requireNode('electron').ipcRenderer;
-    }
-    else {
-        window.ipc = {
-            send: function () {},
-            on: function () {}
-        };
-    }
-
     document.addEventListener("keydown", function (e) {
         if (e.which === 123) { // F12
-            ipc.send('devtools', null);
+            window.postMessage({ action: 'devtools'}, '*');
         } else if (e.which === 116) { // F5
             location.reload();
         }

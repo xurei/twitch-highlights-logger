@@ -6,11 +6,6 @@ const debug = require('debug')('twitch-highlights-ipc');
 module.exports = {
     start: function(app) {
         const mainWindow = require('./main-window');
-        
-        ipc.on('set_config', function(event, newConfig) {
-            debug('newConfig', newConfig);
-        });
-    
         ipc.on('load_chatlog', function(event, arg) {
             console.log(arg);
             twitchChatProvider.loadChatlog(arg).then(data => {
@@ -25,10 +20,6 @@ module.exports = {
     
         ipc.on('github_page', function(/*event, arg*/) {
             shell.openExternal('https://github.com/xurei/twitch-highlights-logger');
-        });
-    
-        ipc.on('close', function(/*event, arg*/) {
-            mainWindow.hide();
         });
         
         ipc.on('devtools', function(/*event, arg*/) {

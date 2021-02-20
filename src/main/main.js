@@ -1,24 +1,24 @@
-import { app, session } from 'electron';
+import { app, session, BrowserWindow } from 'electron';
 const debug = require('debug')('twitch-highlights-app');
+const ipc = require('electron').ipcMain;
 import ipcService from './ipc';
 import platform from './platform';
+import releasesProvider from './providers/releases-provider';
+import semver from 'semver';
+//noinspection JSFileReferences,JSUnresolvedFunction
+const pkg = require('./package.json');
 //----------------------------------------------------------------------------------------------------------------------
 
 debug('platform:', platform.name);
 debug('arch:', platform.arch);
-const APPPATH = __dirname;
-debug('APPPATH:', APPPATH);
 //----------------------------------------------------------------------------------------------------------------------
-
-let DIRSEP = '/';
-if (platform.isWin)
-{DIRSEP = '\\';}
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the javascript object is GCed.
 let mainWindow = null;
 //----------------------------------------------------------------------------------------------------------------------
 
+let App_ready_timeout = 1000;
 const App = {
     ready: () => {
         session.defaultSession.webRequest.onHeadersReceived((details, done) => {
@@ -55,20 +55,50 @@ const App = {
         });
         
         ipcService.start(app);
-        //mainWindow.toggleDevTools();
-        
-        function toggleWindow() {
-            mainWindow.show();
-        }
     
-        mainWindow = require('./main-window');
-        mainWindow.once('ready-to-show', () => {
-            console.log('Ready to show');
-            mainWindow.show();
-        });
+        App.createWindow();
+        //mainWindow.toggleDevTools();
         
         //TODO remove this toggleWindow()
         //toggleWindow();
+    },
+    
+    createWindow: () => {
+        let webappReady = false;
+        ipc.on('webapp_ready', function(/*event, arg*/) {
+            webappReady = true;
+        });
+        
+        mainWindow = require('./main-window');
+        mainWindow.show();
+        mainWindow.setBackgroundColor('#333333');
+        
+        setTimeout(() => {
+            if (!webappReady) {
+                console.log('Webapp not ready :-(');
+                App.createWindow();
+            }
+            else {
+                console.log('Webapp ready :-D');
+                releasesProvider.loadLatestRelease()
+                .then((release) => {
+                    if (release) {
+                        console.log(`Latest release: ${release.tag_name} vs ${pkg.version}`);
+                        if (semver.gt(release.tag_name.substring(1), pkg.version)) {
+                            release.new_version = true;
+                            console.log(`NEW VERSION ${release.tag_name}`);
+                        }
+                        mainWindow.webContents.send('latest_version', release);
+                    }
+                    return;
+                })
+                .catch(e => {
+                    console.error(e);
+                });
+            }
+        }, App_ready_timeout);
+        
+        App_ready_timeout *= 2;
     },
     
     exit: () => {
@@ -90,8 +120,8 @@ console.log('getDataPath', app.getPath('userData'));
 
 //PLATFORM DETECTION
 process.on('uncaughtException', function(err) {
-    console.log('EXCEPTION OCCURRED');
-    console.log(err);
+    console.error('EXCEPTION OCCURRED');
+    console.error(err);
     app.exit();
 });
 
@@ -99,10 +129,21 @@ app.commandLine.appendSwitch('disable-http-cache', '');
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
-    if (process.platform !== 'darwin')
-    {app.quit();}
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+
+app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+        App.ready();
+    }
 });
 
 // This method will be called when Electron has done everything
 // initialization and ready for creating browser windows.
-app.on('ready', App.ready);
+app.whenReady().then(App.ready).catch(e => {
+    console.error('EXCEPTION OCCURRED');
+    console.error(e);
+    app.exit();
+});

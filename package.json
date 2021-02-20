@@ -1,6 +1,6 @@
 {
   "name": "twitch-highlights-logger",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "An app to detect highlights in a Twitch VOD",
   "main": "main.js",
   "scripts": {

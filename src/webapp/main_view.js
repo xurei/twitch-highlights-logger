@@ -80,7 +80,7 @@ class MainView extends React.Component {
                         <FlexLayout direction="row">
                             <FlexChild grow={0} width={350}>
                                 <div className="overflow-hidden clickable" onClick={() => {
-                                    global.ipc.send('github_page');
+                                    global.postMessage({ action: 'github_page', data: null }, '*');
                                 }}>
                                     https://github.com/xurei/twitch-highlights-logger
                                 </div>

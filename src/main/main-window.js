@@ -1,10 +1,5 @@
 import { BrowserWindow } from 'electron';
 import path from 'path';
-import url from 'url';
-import releasesProvider from './providers/releases-provider';
-import semver from 'semver';
-//noinspection JSFileReferences,JSUnresolvedFunction
-const pkg = require('./package.json');
 
 // Create the browser window.
 const mainWindow = new BrowserWindow({
@@ -19,31 +14,13 @@ const mainWindow = new BrowserWindow({
     },
 });
 mainWindow.setMenu(null);
-mainWindow.setTitle('Twitch highlights');
-mainWindow.toggleDevTools();
+mainWindow.setTitle('Twitch Highlights');
+setTimeout(() => {
+    mainWindow.loadFile('index.html');
+}, 100);
 
-const indexUrl = url.pathToFileURL(path.join(__dirname, 'index.html')).toString();
-mainWindow.loadURL(indexUrl)
-.catch(e => {
-    console.error(e);
-});
-
-mainWindow.on('show', function(e) {
-    releasesProvider.loadLatestRelease()
-    .then((release) => {
-        if (release) {
-            console.log(`Latest release: ${release.tag_name} vs ${pkg.version}`);
-            if (semver.gt(release.tag_name.substring(1), pkg.version)) {
-                release.new_version = true;
-                console.log(`NEW VERSION ${release.tag_name}`);
-            }
-            mainWindow.webContents.send('latest_version', release);
-        }
-        return;
-    })
-    .catch(e => {
-        console.error(e);
-    });
-});
+mainWindow.on('unresponsive', () => {
+    console.log('Window is unresponsive');
+} );
 
 module.exports = mainWindow;

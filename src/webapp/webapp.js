@@ -11,4 +11,6 @@ window.addEventListener('DOMContentLoaded', function() { //eslint-disable-line n
         <MainView/>,
         document.getElementById('content'),
     );
+    global.postMessage({ action: 'webapp_ready', data: null }, '*');
+    document.getElementById('loader').style.opacity = '0.0';
 });

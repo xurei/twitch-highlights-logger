@@ -92,8 +92,8 @@ class VideoView extends React.Component {
             }));
             this.applyFilter();
         });
-        
-        global.ipc.send('load_chatlog', props.video_id);
+    
+        global.postMessage({ action: 'load_chatlog', data: props.video_id }, '*');
     }
     
     componentDidUpdate(prevProps, prevState) {

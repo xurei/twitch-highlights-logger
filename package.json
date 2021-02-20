@@ -17,7 +17,7 @@
   "build": {
     "productName": "TwitchHighlights",
     "appId": "com.xureilab.twitch_highlights",
-    "asar": false,
+    "asar": true,
     "mac": {
       "category": "Utility"
     },

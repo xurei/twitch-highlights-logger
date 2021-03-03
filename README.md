@@ -1,5 +1,5 @@
 <div align="center">
-    <img style="margin: 0 auto" src="src/main/300x300.png" alt="Logo"/>
+    <img style="margin: 0 auto" width="200" src="src/main/300x300.png" alt="Logo"/>
     <h1>Twitch Highlights</h1>
     <h3>Find interesting moments on a Twitch VOD</h3>
 </div>

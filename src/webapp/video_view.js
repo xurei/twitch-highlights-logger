@@ -3,25 +3,7 @@ import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
 import { LocalStorage } from './local_storage';
 import { FlexLayout, FlexChild} from 'xureact/lib/cjs/components/layout/flex-layout';
-
-function slidingWindow(items, windowLength) {
-    if (items.length > 0) {
-        const max_t = Math.round(items[items.length-1].content_offset_seconds);
-        items = items.map(item => {
-            item = {...item};
-            item.content_offset_seconds = Math.round(item.content_offset_seconds);
-            return item;
-        });
-        const out = new Array(max_t+windowLength).fill(0);
-        items.forEach(item => {
-            for (let t2=0; t2<windowLength;++t2) {
-                out[item.content_offset_seconds + t2]++;
-            }
-        });
-        return out;
-    }
-    return [];
-}
+import { slidingWindow } from './sliding-window';
 
 function secondsToTime(t) {
     t = Math.floor(t);
@@ -131,27 +113,12 @@ class VideoView extends React.Component {
             }
         });
         console.log('Filtered chatlog', chatlog);
+        console.log('Threshold:', THRESHOLD);
         LocalStorage.set('LAST_FILTER_USED', state.filterValue);
         LocalStorage.set('LAST_THRESHOLD_USED', state.filterThreshold);
         LocalStorage.set('LAST_WINDOW_LENGTH', state.windowLength);
-        const chatWindow = slidingWindow(chatlog, state.windowLength);
-        const ranges = [];
-        let currentRange = null;
-        chatWindow.forEach((v,i) => {
-            if (v >= THRESHOLD) {
-                if (currentRange === null) {
-                    console.log(`${i}s: ${v}`);
-                    currentRange = { start: i };
-                }
-            }
-            else {
-                if (currentRange !== null) {
-                    currentRange.end = i - 1;
-                    ranges.push(currentRange);
-                    currentRange = null;
-                }
-            }
-        });
+        const ranges = slidingWindow(chatlog, state.windowLength, state.filterThreshold, state.rollback);
+        console.log(ranges);
     
         this.setState(state => ({
             ...state,
@@ -181,15 +148,13 @@ class VideoView extends React.Component {
     render() {
         const props = this.props;
         const state = this.state;
-        const start_delay = state.rollback;
-        const end_delay = state.rollback;
         const ranges = state.ranges || [];
         
         let playbackShown = false;
         const rangeWidgets = [];
         ranges.forEach(range => {
-            const rstart = Math.max(0, range.start - start_delay);
-            const rend = Math.max(rstart, range.end - end_delay);
+            const rstart = Math.max(0, range.start);
+            const rend = Math.max(rstart, range.end);
             const isRangePlaying = (rstart <= state.time && state.time <= rend);
             if (!playbackShown && state.time < rstart) {
                 playbackShown = true;

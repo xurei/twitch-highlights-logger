@@ -189,23 +189,24 @@ class VideoView extends React.Component {
         return (
             <div className={props.className} id="video_view">
                 <div className="flex-main">
-                    <div className="flew-child" style={{width: '85%', flexGrow: 1}}>
+                    <div className="flex-child" style={{width: '85%', flexGrow: 1}}>
                         <div id="main-player"/>
                     </div>
                     <div className="sidebar">
-                        <div className="filters-box">
-                            <div>
-                                Filter:
-                                <input type="text" value={state.filterValue} placeholder="all" onChange={(e) => {
-                                    e.preventDefault();
-                                    const val = e.currentTarget.value;
-                                    this.setState(state => ({
-                                        ...state,
-                                        filterValue: val,
-                                    }));
-                                }}/>
-                            </div>
-                            {/*<div>
+                        <FlexLayout direction="column" style={{height: '100%'}}>
+                            <FlexChild className="filters-box" height={160} grow={0} shrink={0}>
+                                <div>
+                                    Filter:
+                                    <input type="text" value={state.filterValue} placeholder="all" onChange={(e) => {
+                                        e.preventDefault();
+                                        const val = e.currentTarget.value;
+                                        this.setState(state => ({
+                                            ...state,
+                                            filterValue: val,
+                                        }));
+                                    }}/>
+                                </div>
+                                {/*<div>
                                 User:
                                 <input type="text" value={state.userValue} placeholder="all" onChange={(e) => {
                                     e.preventDefault();
@@ -216,72 +217,84 @@ class VideoView extends React.Component {
                                     }));
                                 }}/>
                             </div>*/}
-                            <div>
-                                <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
-                                    <FlexChild>Threshold:&nbsp;</FlexChild>
-                                    <FlexChild grow={1}>
-                                        <div style={{position: 'absolute', width: '100%'}}>
-                                            <input type="number" value={state.filterThreshold} onChange={(e) => {
-                                                e.preventDefault();
-                                                const val = e.currentTarget.value;
-                                                this.setState(state => ({
-                                                    ...state,
-                                                    filterThreshold: Math.max(1, parseInt(val)),
-                                                }));
-                                            }} />
-                                        </div>
-                                    </FlexChild>
-                                </FlexLayout>
-                            </div>
-                            <div>
-                                <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
-                                    <FlexChild>Window length:&nbsp;</FlexChild>
-                                    <FlexChild grow={1}>
-                                        <div className="input-seconds" style={{position: 'absolute', width: '100%'}}>
-                                            <input type="number" value={state.windowLength} onChange={(e) => {
-                                                e.preventDefault();
-                                                const val = e.currentTarget.value;
-                                                this.setState(state => ({
-                                                    ...state,
-                                                    windowLength: Math.max(10, parseInt(val)),
-                                                }));
-                                            }} />
-                                        </div>
-                                    </FlexChild>
-                                </FlexLayout>
-                            </div>
-                            <div>
-                                <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
-                                    <FlexChild>Rollback:&nbsp;</FlexChild>
-                                    <FlexChild grow={1}>
-                                        <div className="input-seconds" style={{position: 'absolute', width: '100%'}}>
-                                            <input type="number" value={state.rollback} onChange={(e) => {
-                                                e.preventDefault();
-                                                const val = e.currentTarget.value;
-                                                const rollback = Math.max(0, parseInt(val));
-                                                this.setState(state => ({
-                                                    ...state,
-                                                    rollback: rollback,
-                                                }));
-                                                LocalStorage.set('LAST_ROLLBACK', rollback);
-                                            }} />
-                                        </div>
-                                    </FlexChild>
-                                </FlexLayout>
-                            </div>
-                            <div>{state.filterMatchingCount} messages matching</div>
-                            <div>{(state.ranges || []).length} ranges found</div>
-                        </div>
-                        
-                        <div className="ranges-box">
-                            {!state.chatlog_ready ? (
-                                <div>Loading chatlog...</div>
-                            ) : (
                                 <div>
-                                    {rangeWidgets}
+                                    <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
+                                        <FlexChild>Threshold:&nbsp;</FlexChild>
+                                        <FlexChild grow={1}>
+                                            <div style={{position: 'absolute', width: '100%'}}>
+                                                <input type="number" value={state.filterThreshold} onChange={(e) => {
+                                                    e.preventDefault();
+                                                    const val = e.currentTarget.value;
+                                                    this.setState(state => ({
+                                                        ...state,
+                                                        filterThreshold: Math.max(1, parseInt(val)),
+                                                    }));
+                                                }} />
+                                            </div>
+                                        </FlexChild>
+                                    </FlexLayout>
                                 </div>
-                            )}
-                        </div>
+                                <div>
+                                    <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
+                                        <FlexChild>Window length:&nbsp;</FlexChild>
+                                        <FlexChild grow={1}>
+                                            <div className="input-seconds" style={{position: 'absolute', width: '100%'}}>
+                                                <input type="number" value={state.windowLength} onChange={(e) => {
+                                                    e.preventDefault();
+                                                    const val = e.currentTarget.value;
+                                                    this.setState(state => ({
+                                                        ...state,
+                                                        windowLength: Math.max(10, parseInt(val)),
+                                                    }));
+                                                }} />
+                                            </div>
+                                        </FlexChild>
+                                    </FlexLayout>
+                                </div>
+                                <div>
+                                    <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
+                                        <FlexChild>Rollback:&nbsp;</FlexChild>
+                                        <FlexChild grow={1}>
+                                            <div className="input-seconds" style={{position: 'absolute', width: '100%'}}>
+                                                <input type="number" value={state.rollback} onChange={(e) => {
+                                                    e.preventDefault();
+                                                    const val = e.currentTarget.value;
+                                                    const rollback = Math.max(0, parseInt(val));
+                                                    this.setState(state => ({
+                                                        ...state,
+                                                        rollback: rollback,
+                                                    }));
+                                                    LocalStorage.set('LAST_ROLLBACK', rollback);
+                                                }} />
+                                            </div>
+                                        </FlexChild>
+                                    </FlexLayout>
+                                </div>
+                                <div>{state.filterMatchingCount} messages matching</div>
+                                <div>{(state.ranges || []).length} ranges found</div>
+    
+                            </FlexChild>
+                            <FlexChild height={100} grow={1}>
+                                {!state.chatlog_ready ? (
+                                    <div className="block-padder">Loading chatlog...</div>
+                                ) : (
+                                    <div className="block-padder" style={{height: '100%'}}>
+                                        {rangeWidgets}
+                                    </div>
+                                )}
+                            </FlexChild>
+                            <FlexChild height={50} grow={1}>
+                                <FlexLayout direction="column" style={{height: '100%'}}>
+                                    <FlexChild className="overflow-y-scroll">
+                                    </FlexChild>
+                                    <FlexChild className="overflow-y-scroll">
+                                        <div className="block-padder">
+                                            Chat
+                                        </div>
+                                    </FlexChild>
+                                </FlexLayout>
+                            </FlexChild>
+                        </FlexLayout>
                     </div>
                 </div>
             </div>
@@ -303,14 +316,27 @@ VideoView = Styled(VideoView)`
   }
 
   .sidebar {
-    overflow-y: scroll;
+    position: relative;
     height: 100%;
-    width: 230px;
+    width: 340px;
     flex-grow: 0;
+    flex-shrink: 1;
+  }
+  
+  .block-padder {
+    padding: 10px;
   }
 
-  .filters-box, .ranges-box {
+  .filters-box {
     padding: 10px;
+  }
+
+  .ranges-box {
+    height: 100%;
+  }
+  
+  .overflow-y-scroll {
+    overflow-y: scroll;
   }
 
   .filters-box {

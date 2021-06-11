@@ -17,7 +17,12 @@ mainWindow.setMenu(null);
 mainWindow.setTitle('Twitch Highlights');
 mainWindow.webContents.openDevTools();
 setTimeout(() => {
-    mainWindow.loadFile('index.html');
+    mainWindow.loadURL(`file://${  __dirname  }/index.html`)
+    .catch(e => {
+        console.log('ERROR loading window:');
+        console.log(e);
+    })
+    //mainWindow.loadFile('index.html');
 }, 100);
 
 mainWindow.on('unresponsive', () => {

@@ -15,6 +15,7 @@ const mainWindow = new BrowserWindow({
 });
 mainWindow.setMenu(null);
 mainWindow.setTitle('Twitch Highlights');
+mainWindow.webContents.openDevTools();
 setTimeout(() => {
     mainWindow.loadFile('index.html');
 }, 100);

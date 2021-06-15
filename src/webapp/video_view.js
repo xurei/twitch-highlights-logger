@@ -4,6 +4,7 @@ import Styled from 'styled-components';
 import { LocalStorage } from './local_storage';
 import { FlexLayout, FlexChild} from 'xureact/lib/cjs/components/layout/flex-layout';
 import { slidingWindow } from './sliding-window';
+import { Embed } from './natives/twitch_embed_v1';
 
 function secondsToTime(t) {
     t = Math.floor(t);
@@ -48,7 +49,7 @@ class VideoView extends React.Component {
             // only needed if your site is also embedded on embed.example.com and othersite.example.com
             parent: [ 'localhost' ]
         };
-        this.player = new global.Twitch.Player('main-player', options);
+        this.player = new Embed('main-player', options);
         //this.player.setVolume(0.5);
         setTimeout(() => {
             this.player.setMuted(false);

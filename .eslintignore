@@ -2,3 +2,4 @@
 /dist/*
 /lab/*
 mock_*
+/src/webapp/natives/*

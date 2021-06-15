@@ -26,7 +26,7 @@ const provider = {
                             progress: true,
                             //start: argv.start,
                             //end: argv.end,
-                            length: 0
+                            length: 0,
                         });
                         storage.set(`twitch_chatlog.${video_id}`, chatlog, function(error, data) {
                             if (error) {

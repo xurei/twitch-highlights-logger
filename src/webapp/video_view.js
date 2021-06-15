@@ -15,7 +15,7 @@ function secondsToTime(t) {
     t -= minutes;
     t /= 60;
     const hours = t;
-    return `${hours}:${(minutes < 10 ? '0' : '') + minutes}:${(seconds < 10 ? '0' : '') + seconds}`
+    return `${hours}:${(minutes < 10 ? '0' : '') + minutes}:${(seconds < 10 ? '0' : '') + seconds}`;
 }
 
 class VideoView extends React.Component {
@@ -47,7 +47,7 @@ class VideoView extends React.Component {
             video: props.video_id,
             //collection: "<collection ID>",
             // only needed if your site is also embedded on embed.example.com and othersite.example.com
-            parent: [ 'localhost' ]
+            parent: [ 'localhost' ],
         };
         this.player = new Embed('main-player', options);
         //this.player.setVolume(0.5);
@@ -108,7 +108,7 @@ class VideoView extends React.Component {
                 const msg = chatline.message.body.toLowerCase();
                 const user = chatline.commenter.display_name.toLowerCase();
                 return (
-                   (!state.filterValue || state.filterValue === '' || msg.indexOf(state.filterValue.toLowerCase()) !== -1)
+                    (!state.filterValue || state.filterValue === '' || msg.indexOf(state.filterValue.toLowerCase()) !== -1)
                 && (!state.userValue || state.userValue === '' || user.indexOf(state.userValue.toLowerCase()) !== -1)
                 );
             }
@@ -166,19 +166,19 @@ class VideoView extends React.Component {
             }
             rangeWidgets.push(
                 <a key={range.start} href="javascript:" className={`highlight_range ${isRangePlaying ? 'active' : ''}`}
-                   onClick={() => {
-                       this.player.play();
-                       setTimeout(() => {
-                           this.player.seek(rstart);
-                       }, 50);
-                   }}
+                    onClick={() => {
+                        this.player.play();
+                        setTimeout(() => {
+                            this.player.seek(rstart);
+                        }, 50);
+                    }}
                 >
                     <span className={`playback-state`}>▶</span>
                     {`${secondsToTime(rstart)} - ${secondsToTime(rend)}`}
                     {isRangePlaying && (
                         <div key="playback"><span className={`playback-state`}/>{secondsToTime(state.time)}</div>
                     )}
-                </a>
+                </a>,
             );
         });
         if (!playbackShown) {
@@ -202,7 +202,7 @@ class VideoView extends React.Component {
                                     this.setState(state => ({
                                         ...state,
                                         filterValue: val,
-                                    }))
+                                    }));
                                 }}/>
                             </div>
                             {/*<div>

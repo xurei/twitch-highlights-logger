@@ -15,9 +15,7 @@ const mainWindow = new BrowserWindow({
 });
 mainWindow.setMenu(null);
 mainWindow.setTitle('Twitch Highlights');
-setTimeout(() => {
-    mainWindow.loadFile('index.html');
-}, 100);
+mainWindow.loadFile('index.html');
 
 mainWindow.on('unresponsive', () => {
     console.log('Window is unresponsive');

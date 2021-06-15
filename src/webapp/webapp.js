@@ -6,7 +6,7 @@ import MainView from './main_view';
 window.global = window; //eslint-disable-line no-undef
 const document = window.document; //eslint-disable-line no-undef
 
-window.addEventListener('DOMContentLoaded', function() { //eslint-disable-line no-undef
+function initApp() { //eslint-disable-line no-undef
     ReactDOM.render(
         <MainView/>,
         document.getElementById('content'),
@@ -15,4 +15,13 @@ window.addEventListener('DOMContentLoaded', function() { //eslint-disable-line n
     setTimeout(() => {
         document.getElementById('loader').style.opacity = '0.0';
     }, 700);
-});
+}
+
+if( document.readyState !== 'loading' ) {
+    console.log( 'document is already ready' );
+    initApp();
+}
+else {
+    console.log( 'document not ready, waiting for it to load...' );
+    document.addEventListener('DOMContentLoaded', initApp);
+}

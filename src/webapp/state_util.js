@@ -33,8 +33,8 @@ function setSubState_one(subStateName, substateFn) {
             console.error('Substate is not an object nor an Array, you don\'t need to use setSubState');
         }*/
     
-        let subStateCopy = state[subStateName];
-        out[subStateName] = substateFn(subStateCopy);;
+        const subStateCopy = state[subStateName];
+        out[subStateName] = substateFn(subStateCopy);
         return out;
     };
 }

@@ -53,8 +53,6 @@ class VideoView extends React.Component {
         const lastThreshold = LocalStorage.get('LAST_THRESHOLD_USED', 3);
         const lastWindowLength = LocalStorage.get('LAST_WINDOW_LENGTH', 120);
         
-        console.log("LAST_FILTER_USED", lastFilter)
-        
         if (typeof(lastFilter) === 'string') {
             lastFilter = [ lastFilter ];
         }
@@ -105,7 +103,7 @@ class VideoView extends React.Component {
                 const msg = chatline.message.body.toLowerCase();
                 const user = chatline.commenter.display_name.toLowerCase();
                 
-                let foundMatchingValue = state.filterValues.some(filterValue => {
+                const foundMatchingValue = state.filterValues.some(filterValue => {
                     return filterValue && msg.indexOf(filterValue.toLowerCase()) !== -1;
                 });
                 

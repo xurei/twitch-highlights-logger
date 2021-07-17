@@ -171,7 +171,7 @@ class VideoView extends React.Component {
             );
         });
         if (!playbackShown) {
-            rangeWidgets.unshift(this.renderPlayback());
+            rangeWidgets.push(this.renderPlayback());
             playbackShown = true;
         }
         

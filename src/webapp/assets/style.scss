@@ -2,6 +2,11 @@ $main-color: #ef8ae3;
 $main-color-dark: #d56cc9;
 $main-color-darker: #a8529f;
 
+:root {
+  color-scheme: dark;
+  scrollbar-color: rgba(249,249,250,.4) rgba(20,20,25,.3);
+}
+
 html, body {
   height: 100vh;
   overflow-y: hidden;
@@ -103,4 +108,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 .clickable {
   cursor: pointer;
+}
+
+.fullh {
+  height: 100%;
 }

@@ -1,5 +1,4 @@
-export function slidingWindow(items, windowLength, threshold, rollback) {
-    rollback = rollback || 0;
+export function slidingWindow(items, windowLength, threshold) {
     if (items.length > 0) {
         const ranges = [];
         
@@ -14,7 +13,7 @@ export function slidingWindow(items, windowLength, threshold, rollback) {
             
             const nbMatches = j - i + 1;
             if (nbMatches >= threshold) {
-                ranges.push({ start: Math.max(0, items[i].content_offset_seconds - rollback), end: items[j].content_offset_seconds, nbMatches: nbMatches });
+                ranges.push({ start: Math.max(0, items[i].content_offset_seconds), end: items[j].content_offset_seconds, nbMatches: nbMatches });
                 i = j + 1;
             }
             else {

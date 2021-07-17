@@ -5,18 +5,10 @@ import { LocalStorage } from './local_storage';
 import { FlexLayout, FlexChild} from 'xureact/lib/cjs/components/layout/flex-layout';
 import { slidingWindow } from './sliding-window';
 import { Embed } from './natives/twitch_embed_v1';
+import autobind from 'autobind-decorator';
+import { Chatlog } from './chatlog';
+import { secondsToTime } from './seconds-to-time';
 
-function secondsToTime(t) {
-    t = Math.floor(t);
-    const seconds = (t%60);
-    t -= seconds;
-    t /= 60;
-    const minutes = (t%60);
-    t -= minutes;
-    t /= 60;
-    const hours = t;
-    return `${hours}:${(minutes < 10 ? '0' : '') + minutes}:${(seconds < 10 ? '0' : '') + seconds}`;
-}
 
 class VideoView extends React.Component {
     static propTypes = {
@@ -32,7 +24,7 @@ class VideoView extends React.Component {
         filterMatchingCount: 0,
         filterThreshold: 15,
         windowLength: 120,
-        rollback: 20,
+        chatVisible: true,
     };
     videoInterval = null;
     
@@ -59,13 +51,11 @@ class VideoView extends React.Component {
         const lastFilter = LocalStorage.get('LAST_FILTER_USED', 'copainLUL');
         const lastThreshold = LocalStorage.get('LAST_THRESHOLD_USED', 3);
         const lastWindowLength = LocalStorage.get('LAST_WINDOW_LENGTH', 120);
-        const lastRollback = LocalStorage.get('LAST_ROLLBACK', 20);
         this.setState(state => ({
             ...state,
             filterValue: lastFilter,
             filterThreshold: lastThreshold,
             windowLength: lastWindowLength,
-            rollback: lastRollback,
         }));
         
         global.ipc.on('chatlog', (event, chatlog) => {
@@ -86,7 +76,6 @@ class VideoView extends React.Component {
             if (prevState.filterValue !== state.filterValue
             ||  prevState.userValue !== state.userValue
             ||  prevState.filterThreshold !== state.filterThreshold
-            //||  prevState.rollback !== state.rollback
             ||  prevState.windowLength !== state.windowLength) {
                 this.applyFilter();
             }
@@ -118,7 +107,7 @@ class VideoView extends React.Component {
         LocalStorage.set('LAST_FILTER_USED', state.filterValue);
         LocalStorage.set('LAST_THRESHOLD_USED', state.filterThreshold);
         LocalStorage.set('LAST_WINDOW_LENGTH', state.windowLength);
-        const ranges = slidingWindow(chatlog, state.windowLength, state.filterThreshold, state.rollback);
+        const ranges = slidingWindow(chatlog, state.windowLength, state.filterThreshold);
         console.log(ranges);
     
         this.setState(state => ({
@@ -189,175 +178,249 @@ class VideoView extends React.Component {
         return (
             <div className={props.className} id="video_view">
                 <div className="flex-main">
-                    <div className="flew-child" style={{width: '85%', flexGrow: 1}}>
+                    <div className="flex-child" style={{width: '85%', flexGrow: 1}}>
                         <div id="main-player"/>
                     </div>
                     <div className="sidebar">
-                        <div className="filters-box">
-                            <div>
-                                Filter:
-                                <input type="text" value={state.filterValue} placeholder="all" onChange={(e) => {
-                                    e.preventDefault();
-                                    const val = e.currentTarget.value;
-                                    this.setState(state => ({
-                                        ...state,
-                                        filterValue: val,
-                                    }));
-                                }}/>
-                            </div>
-                            {/*<div>
-                                User:
-                                <input type="text" value={state.userValue} placeholder="all" onChange={(e) => {
-                                    e.preventDefault();
-                                    const val = e.currentTarget.value;
-                                    this.setState(state => ({
-                                        ...state,
-                                        userValue: val,
-                                    }));
-                                }}/>
-                            </div>*/}
-                            <div>
-                                <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
-                                    <FlexChild>Threshold:&nbsp;</FlexChild>
-                                    <FlexChild grow={1}>
-                                        <div style={{position: 'absolute', width: '100%'}}>
-                                            <input type="number" value={state.filterThreshold} onChange={(e) => {
-                                                e.preventDefault();
-                                                const val = e.currentTarget.value;
-                                                this.setState(state => ({
-                                                    ...state,
-                                                    filterThreshold: Math.max(1, parseInt(val)),
-                                                }));
-                                            }} />
-                                        </div>
-                                    </FlexChild>
-                                </FlexLayout>
-                            </div>
-                            <div>
-                                <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
-                                    <FlexChild>Window length:&nbsp;</FlexChild>
-                                    <FlexChild grow={1}>
-                                        <div className="input-seconds" style={{position: 'absolute', width: '100%'}}>
-                                            <input type="number" value={state.windowLength} onChange={(e) => {
-                                                e.preventDefault();
-                                                const val = e.currentTarget.value;
-                                                this.setState(state => ({
-                                                    ...state,
-                                                    windowLength: Math.max(10, parseInt(val)),
-                                                }));
-                                            }} />
-                                        </div>
-                                    </FlexChild>
-                                </FlexLayout>
-                            </div>
-                            <div>
-                                <FlexLayout direction="row" style={{width: '100%', overflow: 'hidden'}}>
-                                    <FlexChild>Rollback:&nbsp;</FlexChild>
-                                    <FlexChild grow={1}>
-                                        <div className="input-seconds" style={{position: 'absolute', width: '100%'}}>
-                                            <input type="number" value={state.rollback} onChange={(e) => {
-                                                e.preventDefault();
-                                                const val = e.currentTarget.value;
-                                                const rollback = Math.max(0, parseInt(val));
-                                                this.setState(state => ({
-                                                    ...state,
-                                                    rollback: rollback,
-                                                }));
-                                                LocalStorage.set('LAST_ROLLBACK', rollback);
-                                            }} />
-                                        </div>
-                                    </FlexChild>
-                                </FlexLayout>
-                            </div>
-                            <div>{state.filterMatchingCount} messages matching</div>
-                            <div>{(state.ranges || []).length} ranges found</div>
-                        </div>
-                        
-                        <div className="ranges-box">
-                            {!state.chatlog_ready ? (
-                                <div>Loading chatlog...</div>
-                            ) : (
+                        <FlexLayout direction="column" style={{height: '100%'}}>
+                            <FlexChild className="filters-box" height={160} grow={0} shrink={0}>
                                 <div>
-                                    {rangeWidgets}
+                                    <span className="filter-input-name">
+                                        Filter:
+                                    </span>
+                                    <input type="text" value={state.filterValue} placeholder="all" onChange={(e) => {
+                                        e.preventDefault();
+                                        const val = e.currentTarget.value;
+                                        this.setState(state => ({
+                                            ...state,
+                                            filterValue: val,
+                                        }));
+                                    }}/>
                                 </div>
+                                <div>
+                                    <span className="filter-input-name">
+                                        Threshold:
+                                    </span>
+                                    <input type="number" value={state.filterThreshold} onChange={(e) => {
+                                        e.preventDefault();
+                                        const val = e.currentTarget.value;
+                                        this.setState(state => ({
+                                            ...state,
+                                            filterThreshold: Math.max(1, parseInt(val)),
+                                        }));
+                                    }} />
+                                </div>
+                                <div>
+                                    <span className="filter-input-name">
+                                        Window length:
+                                    </span>
+                                    <input type="number" value={state.windowLength} onChange={(e) => {
+                                        e.preventDefault();
+                                        const val = e.currentTarget.value;
+                                        this.setState(state => ({
+                                            ...state,
+                                            windowLength: Math.max(10, parseInt(val)),
+                                        }));
+                                    }} />
+                                </div>
+                                <div>{state.filterMatchingCount} messages matching</div>
+                                <div>{(state.ranges || []).length} ranges found</div>
+    
+                            </FlexChild>
+                            <FlexChild height={0} grow={1} className="overflow-y-scroll">
+                                {!state.chatlog_ready ? (
+                                    <div className="block-padder">Loading chatlog...</div>
+                                ) : (
+                                    <div className="block-padder" style={{height: '100%'}}>
+                                        {rangeWidgets}
+                                    </div>
+                                )}
+                            </FlexChild>
+                            {state.chatlog_ready && (
+                                <FlexChild height={36} grow={0} className="chat-toggle">
+                                    <button className={`chat__toggle-btn ${state.chatVisible ? '' : 'hidden'}`}
+                                            onClick={this.handleVisibilityToggle}>
+                                        Chat
+                                    </button>
+                                </FlexChild>
                             )}
-                        </div>
+                            {state.chatlog_ready && (
+                                <FlexChild height={0} grow={state.chatVisible ? 3 : 0} className="chat-block overflow-y-scroll">
+                                    <div className="fullh">
+                                        {state.chatlog && (
+                                          <Chatlog chatlog={state.chatlog}/>
+                                        )}
+                                        {/*<pre>{JSON.stringify(state.chatlog, null, '  ')}</pre>*/}
+                                    </div>
+                                </FlexChild>
+                            )}
+                            {/*<FlexChild height={50} grow={1}>*/}
+                            {/*    <FlexLayout direction="column" className="fullh">*/}
+                            {/*    </FlexLayout>*/}
+                            {/*</FlexChild>*/}
+                        </FlexLayout>
                     </div>
                 </div>
             </div>
         );
+    }
+    
+    @autobind
+    handleVisibilityToggle() {
+        this.setState(state => ({
+            ...state,
+            chatVisible: !state.chatVisible,
+        }));
     }
 }
 
 //language=SCSS
 VideoView = Styled(VideoView)`
 & {
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  
-  #main-player {
-    position: relative;
-    width: 100%;
     height: 100%;
-  }
-
-  .sidebar {
-    overflow-y: scroll;
-    height: 100%;
-    width: 230px;
-    flex-grow: 0;
-  }
-
-  .filters-box, .ranges-box {
-    padding: 10px;
-  }
-
-  .filters-box {
-    background: rgba(0,0,0, 0.1);
-    line-height: 1.45em;
-    input {
-      max-width: 100%;
-    }
-    .input-seconds {
-      &:after {
-        content: "s";
-        display: inline-block;
-        position: absolute;
-        right: 22px;
-        color: #aaa;
-        font-size: 0.8em;
-      }
-    }
-  }
-  
-  .playback-state {
-    width: 20px;
-    display: inline-block;
     position: relative;
-    top: -2px;
-    visibility: hidden;
-    &.visible {
-      visibility: visible;
-    }
-  }
-  
-  .highlight_range {
-    display: block;
-    line-height: 1.3em;
-    margin-left: -10px;
-    margin-right: -10px;
-    padding: 0 10px;
+    overflow: hidden;
     
-    &.active {
-      background: #d56cc9;
-      color: #fff;
-
-      .playback-state {
-        visibility: visible;
-      }
+    #main-player {
+        position: relative;
+        width: 100%;
+        height: 100%;
     }
-  }
+    
+    .sidebar {
+        position: relative;
+        height: 100%;
+        width: 340px;
+        flex-grow: 0;
+        flex-shrink: 1;
+    }
+    
+    .block-padder {
+        padding: 10px;
+    }
+    
+    .filters-box {
+        padding: 10px;
+        
+        input {
+            width: 170px;
+        }
+    }
+    
+    .filter-input-name {
+        display: inline-block;
+        width: 115px;
+        text-align: right;
+        padding-right: 3px;
+    }
+    
+    .ranges-box {
+        height: 100%;
+    }
+    
+    .overflow-y-scroll {
+        overflow-y: scroll;
+    }
+    
+    .chat-block {
+        transition: flex-grow ease-out 0.2s;
+    }
+    
+    .chat-toggle {
+      background: rgba(0,0,0, 0.1);
+    }
+    
+    .chat__toggle-btn {
+        padding: 5px 7px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 18px;
+        
+        &:before {
+            font-size: 28px;
+            content: "⌄";
+            position: relative;
+            top: -3px;
+        }
+        
+        //&:hover {
+        //    //padding-top: 0 !important;
+        //    //padding-bottom: 10px !important;
+        //
+        //    &:before {
+        //        content: "⌃";
+        //        top: 10px;
+        //    }
+        //}
+        
+        line-height: 20px;
+        
+        &.hidden {
+            &:before {
+                content: "⌃";
+                top: 10px;
+            }
+            
+            //&:hover {
+            //    :before {
+            //        content: "⌄";
+            //        top: -3px;
+            //    }
+            //}
+        }
+        
+        background: none !important;
+        border: none !important;
+    }
+    
+    .filters-box {
+        background: rgba(0, 0, 0, 0.1);
+        line-height: 1.45em;
+        
+        input {
+            max-width: 100%;
+        }
+        
+        .input-seconds {
+            &:after {
+                content: "s";
+                display: inline-block;
+                position: absolute;
+                right: 22px;
+                color: #aaa;
+                font-size: 0.8em;
+            }
+        }
+    }
+    
+    .playback-state {
+        width: 20px;
+        display: inline-block;
+        position: relative;
+        top: -2px;
+        visibility: hidden;
+        
+        &.visible {
+            visibility: visible;
+        }
+    }
+    
+    .highlight_range {
+        display: block;
+        line-height: 1.3em;
+        margin-left: -10px;
+        margin-right: -10px;
+        padding: 0 10px;
+        
+        &.active {
+            background: #d56cc9;
+            color: #fff;
+            
+            .playback-state {
+                visibility: visible;
+            }
+        }
+    }
 }
 `;
 

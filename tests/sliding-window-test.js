@@ -31,7 +31,7 @@ function windowTest(params, timestamps, expected) {
     describe('log: ' + timestamps.join(', '), function() {
         it('should match the expected window', function() {
             const chatlog = mockChatlog(...timestamps);
-            const window = slidingWindow(chatlog, params.W, params.N, params.R);
+            const window = slidingWindow(chatlog, params.W, params.N);
             console.log(window);
             expect(window).to.deep.eq(expected);
         });
@@ -41,7 +41,7 @@ function windowTest(params, timestamps, expected) {
 describe('slidingWindow', function() {
     describe('corner case : empty chatlog', function() {
         windowTest(
-            {W: 100, N: 3, R: 0},
+            {W: 100, N: 3},
             [ ],
             [ ]
         );
@@ -49,7 +49,7 @@ describe('slidingWindow', function() {
     
     describe('Multiple messages at the same timestamp', function() {
         windowTest(
-            {W: 100, N: 3, R: 0},
+            {W: 100, N: 3},
             [5, 5, 5, 5, 250],
             [
                 {start: 5, end: 5, nbMatches: 4},
@@ -57,9 +57,9 @@ describe('slidingWindow', function() {
         );
     });
     
-    describe('W=2, N=1, R=0', function() {
+    describe('W=2, N=1', function() {
         windowTest(
-            {W: 2, N: 1, R: 0},
+            {W: 2, N: 1},
             [5, 60, 85, 100, 350],
             [
                 {start: 5, end: 5, nbMatches: 1},
@@ -71,9 +71,9 @@ describe('slidingWindow', function() {
         );
     });
     
-    describe('W=120, N=1, R=0 (actual case)', function() {
+    describe('W=120, N=1 (actual case)', function() {
         windowTest(
-            {W: 120, N: 1, R: 0},
+            {W: 120, N: 1},
             [ 10247.08, 16272.53 ],
             [
                 {start: 10247.08, end: 10247.08, nbMatches: 1},
@@ -82,9 +82,9 @@ describe('slidingWindow', function() {
         );
     });
     
-    describe('W=100, N=3, R=0', function() {
+    describe('W=100, N=3', function() {
         windowTest(
-            {W: 100, N: 3, R: 0},
+            {W: 100, N: 3},
             [ 5, 60, 85, 100, 350 ],
             [
                 {start: 5, end: 100, nbMatches: 4}
@@ -92,7 +92,7 @@ describe('slidingWindow', function() {
         );
     
         windowTest(
-            {W: 100, N: 3, R: 0},
+            {W: 100, N: 3},
             [ 5, 60, 85, 90, 100, 350 ],
             [
                 {start: 5, end: 100, nbMatches: 5}
@@ -100,7 +100,7 @@ describe('slidingWindow', function() {
         );
     
         windowTest(
-            {W: 100, N: 3, R: 0},
+            {W: 100, N: 3},
             [ 5, 60, 85, 100, 110, 120, 130, 140, 150, 200, 300 ],
             [
                 {start: 5, end: 100, nbMatches: 4},
@@ -109,7 +109,7 @@ describe('slidingWindow', function() {
         );
     
         windowTest(
-            {W: 100, N: 3, R: 0},
+            {W: 100, N: 3},
             [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200 ],
             [
                 {start: 10, end: 100, nbMatches: 10},
@@ -118,20 +118,9 @@ describe('slidingWindow', function() {
         );
     });
     
-    describe('W=100, N=3, R=20', function() {
+    describe('W=100, N=too many', function() {
         windowTest(
-            {W: 100, N: 3, R: 20},
-            [ 5, 60, 85, 100, 110, 120, 130, 140, 150, 200, 300 ],
-            [
-                {start: 0, end: 100, nbMatches: 4},
-                {start: 90, end: 200, nbMatches: 6},
-            ]
-        );
-    });
-    
-    describe('W=100, N=too many, R=0', function() {
-        windowTest(
-            {W: 100, N: 100, R: 0},
+            {W: 100, N: 100},
             [ 5, 60, 85, 100, 110, 120, 130, 140, 150, 200, 300 ],
             [
             ]

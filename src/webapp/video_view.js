@@ -2,12 +2,13 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
 import { LocalStorage } from './local_storage';
-import { FlexLayout, FlexChild} from 'xureact/lib/cjs/components/layout/flex-layout';
+import { FlexLayout, FlexChild} from 'xureact/lib/module/components/layout/flex-layout';
 import { slidingWindow } from './sliding-window';
 import { Embed } from './natives/twitch_embed_v1';
 import autobind from 'autobind-decorator';
 import { Chatlog } from './chatlog';
-import { secondsToTime } from './seconds-to-time';
+import { secondsToTime } from './seconds_to_time';
+import { InputMultipleValues } from './input_mutliple_values';
 
 
 class VideoView extends React.Component {
@@ -19,7 +20,7 @@ class VideoView extends React.Component {
         chatlog: null,
         ranges: null,
         time: 0,
-        filterValue: '',
+        filterValues: [''],
         userValue: '',
         filterMatchingCount: 0,
         filterThreshold: 15,
@@ -48,12 +49,19 @@ class VideoView extends React.Component {
         }, 2000);
         this.videoInterval = setInterval(this.updatePlayer.bind(this), 500);
     
-        const lastFilter = LocalStorage.get('LAST_FILTER_USED', 'copainLUL');
+        let lastFilter = LocalStorage.get('LAST_FILTER_USED', ['copainLUL']);
         const lastThreshold = LocalStorage.get('LAST_THRESHOLD_USED', 3);
         const lastWindowLength = LocalStorage.get('LAST_WINDOW_LENGTH', 120);
+        
+        console.log("LAST_FILTER_USED", lastFilter)
+        
+        if (typeof(lastFilter) === 'string') {
+            lastFilter = [ lastFilter ];
+        }
+        
         this.setState(state => ({
             ...state,
-            filterValue: lastFilter,
+            filterValues: lastFilter,
             filterThreshold: lastThreshold,
             windowLength: lastWindowLength,
         }));
@@ -73,7 +81,7 @@ class VideoView extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         const state = this.state;
         if (state.chatlog_ready) {
-            if (prevState.filterValue !== state.filterValue
+            if (prevState.filterValues !== state.filterValues
             ||  prevState.userValue !== state.userValue
             ||  prevState.filterThreshold !== state.filterThreshold
             ||  prevState.windowLength !== state.windowLength) {
@@ -96,15 +104,21 @@ class VideoView extends React.Component {
             else {
                 const msg = chatline.message.body.toLowerCase();
                 const user = chatline.commenter.display_name.toLowerCase();
+                
+                let foundMatchingValue = state.filterValues.some(filterValue => {
+                    return filterValue && msg.indexOf(filterValue.toLowerCase()) !== -1;
+                });
+                
                 return (
-                    (!state.filterValue || state.filterValue === '' || msg.indexOf(state.filterValue.toLowerCase()) !== -1)
+                    //(!state.filterValues || state.filterValue === '' || msg.indexOf(state.filterValue.toLowerCase()) !== -1)
+                   foundMatchingValue
                 && (!state.userValue || state.userValue === '' || user.indexOf(state.userValue.toLowerCase()) !== -1)
                 );
             }
         });
         console.log('Filtered chatlog', chatlog);
         console.log('Threshold:', THRESHOLD);
-        LocalStorage.set('LAST_FILTER_USED', state.filterValue);
+        LocalStorage.set('LAST_FILTER_USED', state.filterValues);
         LocalStorage.set('LAST_THRESHOLD_USED', state.filterThreshold);
         LocalStorage.set('LAST_WINDOW_LENGTH', state.windowLength);
         const ranges = slidingWindow(chatlog, state.windowLength, state.filterThreshold);
@@ -182,26 +196,13 @@ class VideoView extends React.Component {
                         <div id="main-player"/>
                     </div>
                     <div className="sidebar">
-                        <FlexLayout direction="column" style={{height: '100%'}}>
-                            <FlexChild className="filters-box" height={160} grow={0} shrink={0}>
+                        <FlexLayout direction="column" className="fullh">
+                            <FlexChild className="filters-box" grow={0} shrink={0}>
                                 <div>
-                                    <span className="filter-input-name">
-                                        Filter:
-                                    </span>
-                                    <input type="text" value={state.filterValue} placeholder="all" onChange={(e) => {
-                                        e.preventDefault();
-                                        const val = e.currentTarget.value;
-                                        this.setState(state => ({
-                                            ...state,
-                                            filterValue: val,
-                                        }));
-                                    }}/>
-                                </div>
-                                <div>
-                                    <span className="filter-input-name">
+                                    <span className="filters-box__input-name">
                                         Threshold:
                                     </span>
-                                    <input type="number" value={state.filterThreshold} onChange={(e) => {
+                                    <input type="number" className="filters-box__input" value={state.filterThreshold} onChange={(e) => {
                                         e.preventDefault();
                                         const val = e.currentTarget.value;
                                         this.setState(state => ({
@@ -211,10 +212,10 @@ class VideoView extends React.Component {
                                     }} />
                                 </div>
                                 <div>
-                                    <span className="filter-input-name">
+                                    <span className="filters-box__input-name">
                                         Window length:
                                     </span>
-                                    <input type="number" value={state.windowLength} onChange={(e) => {
+                                    <input type="number" className="filters-box__input" value={state.windowLength} onChange={(e) => {
                                         e.preventDefault();
                                         const val = e.currentTarget.value;
                                         this.setState(state => ({
@@ -223,9 +224,30 @@ class VideoView extends React.Component {
                                         }));
                                     }} />
                                 </div>
+                                <div>
+                                    <span className="filters-box__input-name">
+                                        Contains:
+                                    </span>
+                                    {/*<input type="text" value={state.filterValue} placeholder="all" onChange={(e) => {*/}
+                                    {/*    e.preventDefault();*/}
+                                    {/*    const val = e.currentTarget.value;*/}
+                                    {/*    this.setState(state => ({*/}
+                                    {/*        ...state,*/}
+                                    {/*        filterValue: val,*/}
+                                    {/*    }));*/}
+                                    {/*}}/>*/}
+                                    <div className="filters-box__input">
+                                        <InputMultipleValues values={state.filterValues} onChange={(values) => {
+                                            //const val = e.currentTarget.value;
+                                            this.setState(state => ({
+                                                ...state,
+                                                filterValues: values,
+                                            }));
+                                        }}/>
+                                    </div>
+                                </div>
                                 <div>{state.filterMatchingCount} messages matching</div>
                                 <div>{(state.ranges || []).length} ranges found</div>
-    
                             </FlexChild>
                             <FlexChild height={0} grow={1} className="overflow-y-scroll">
                                 {!state.chatlog_ready ? (
@@ -299,21 +321,6 @@ VideoView = Styled(VideoView)`
         padding: 10px;
     }
     
-    .filters-box {
-        padding: 10px;
-        
-        input {
-            width: 170px;
-        }
-    }
-    
-    .filter-input-name {
-        display: inline-block;
-        width: 115px;
-        text-align: right;
-        padding-right: 3px;
-    }
-    
     .ranges-box {
         height: 100%;
     }
@@ -376,9 +383,18 @@ VideoView = Styled(VideoView)`
     .filters-box {
         background: rgba(0, 0, 0, 0.1);
         line-height: 1.45em;
-        
-        input {
-            max-width: 100%;
+        padding: 10px;
+    
+        .filters-box__input {
+            width: 170px;
+            display: inline-block;
+        }
+        .filters-box__input-name {
+            display: inline-block;
+            width: 115px;
+            text-align: right;
+            padding-right: 3px;
+            vertical-align: top;
         }
         
         .input-seconds {

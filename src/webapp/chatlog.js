@@ -1,9 +1,8 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
-import autobind from 'autobind-decorator';
 import Styled from 'styled-components';
-import { secondsToTime } from './seconds-to-time';
+import { secondsToTime } from './seconds_to_time';
 
 class Chatlog extends React.Component {
   static propTypes = {
@@ -27,10 +26,10 @@ class Chatlog extends React.Component {
                     </span>
                     :&nbsp;
                     <span>
-                        {!chatline.message.fragments ? chatline.message.body : chatline.message.fragments.map(fragment => {
+                        {!chatline.message.fragments ? chatline.message.body : chatline.message.fragments.map((fragment, index) => {
                           if (fragment.emoticon) {
                             return (
-                              <span key={chatline._id} className="chatlog__img-wrapper">
+                              <span key={`${chatline._id}-${index}`} className="chatlog__img-wrapper">
                                 <div className="chatlog__img-wrapper-tooltip">
                                   {fragment.text}
                                 </div>

@@ -25,7 +25,7 @@ class SelectUrlView extends React.Component {
             <div className={props.className} id="select_url_view">
                 <VCenter>
                     <p>Twitch URL or video ID</p>
-                    <input type="text" id="video_url" placeholder="https://www.twitch.tv/videos/XXXXXXXXX" value={state.url} onChange={(e) => {
+                    <input type="text" autoFocus id="video_url" placeholder="https://www.twitch.tv/videos/XXXXXXXXX" value={state.url} onChange={(e) => {
                         e.preventDefault();
                         const val = e.currentTarget.value;
                         this.setState(state => ({

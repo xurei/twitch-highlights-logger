@@ -30,6 +30,26 @@ class VideoView extends React.Component {
     };
     videoInterval = null;
     
+    constructor(props) {
+        super(props);
+        let lastFilter = LocalStorage.get('LAST_FILTER_USED', ['copainLUL']);
+        const lastThreshold = LocalStorage.get('LAST_THRESHOLD_USED', 3);
+        const lastWindowLength = LocalStorage.get('LAST_WINDOW_LENGTH', 120);
+        const lastRollback = LocalStorage.get('LAST_ROLLBACK', 20);
+        
+        if (typeof(lastFilter) === 'string') {
+            lastFilter = [ lastFilter ];
+        }
+        
+        this.state = {
+            ...this.state,
+            filterValues: lastFilter,
+            filterThreshold: lastThreshold,
+            windowLength: lastWindowLength,
+            rollback: lastRollback,
+        };
+    }
+    
     componentDidMount() {
         const props = this.props;
         const options = {
@@ -50,23 +70,6 @@ class VideoView extends React.Component {
         }, 2000);
         this.videoInterval = setInterval(this.updatePlayer.bind(this), 500);
     
-        let lastFilter = LocalStorage.get('LAST_FILTER_USED', ['copainLUL']);
-        const lastThreshold = LocalStorage.get('LAST_THRESHOLD_USED', 3);
-        const lastWindowLength = LocalStorage.get('LAST_WINDOW_LENGTH', 120);
-        const lastRollback = LocalStorage.get('LAST_ROLLBACK', 20);
-        
-        if (typeof(lastFilter) === 'string') {
-            lastFilter = [ lastFilter ];
-        }
-        
-        this.setState(state => ({
-            ...state,
-            filterValues: lastFilter,
-            filterThreshold: lastThreshold,
-            windowLength: lastWindowLength,
-            rollback: lastRollback,
-        }));
-        
         global.ipc.on('chatlog', (event, chatlog) => {
             this.setState(state => ({
                 ...state,
@@ -407,7 +410,7 @@ VideoView = Styled(VideoView)`
         padding: 10px;
     
         .filters-box__input {
-            width: 170px;
+            width: 190px;
             display: inline-block;
         }
         .filters-box__input-name {

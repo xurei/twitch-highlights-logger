@@ -3,38 +3,42 @@ import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
 import deepEqual from 'deep-eql';
 import autobind from 'autobind-decorator';
+import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
 
 class InputMultipleValues extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
+    values: PropTypes.array.isRequired,
   };
-  
-  state = {
-    nbInputs: 1,
-  };
-  
-  constructor(props) {
-    super(props);
-    this.state = {
-      nbInputs: Math.min(1, props.values.length),
-    }
-  }
   
   render() {
     const props = this.props;
     const state = this.state;
     
     const inputs = [];
-    const nbInputs = Math.max(state.nbInputs, props.values.length);
+    const nbInputs = props.values.length;
     
     for (let index=0; index<nbInputs; ++index) {
       const value = props.values[index] || '';
       inputs.push(
         <div key={index}>
-          {state.nbInputs > 1 && (
-            <div className="input-multiple-values__remove" data-index={index} onClick={this.handleRemoveClick}>−</div>
-          )}
-          <input type="text" value={value} placeholder={index === 0 ? 'all' : ''} data-index={index} onChange={this.handleChange}/>
+          <FlexLayout direaction="row">
+            <FlexChild grow={1} width={1}>
+              <input type="text" autoFocus value={value} placeholder={index === 0 ? 'all' : ''} data-index={index} onChange={this.handleChange}/>
+            </FlexChild>
+  
+            <FlexChild grow={0} width={47}>
+              {index === nbInputs-1 && (
+                <div className="input-multiple-values__add" onClick={this.handleAddClick}>+</div>
+              )}
+              {index !== nbInputs-1 && (
+                <div className="input-multiple-values__placeholder"></div>
+              )}
+              {nbInputs > 1 && (
+                <div className="input-multiple-values__remove" data-index={index} onClick={this.handleRemoveClick}>−</div>
+              )}
+            </FlexChild>
+          </FlexLayout>
         </div>
       );
     }
@@ -43,7 +47,6 @@ class InputMultipleValues extends React.Component {
       <div className={props.className}>
         {/*<pre>{JSON.stringify(state, null, '  ')}</pre>*/}
         {inputs}
-        <div className="input-multiple-values__add" onClick={this.handleAddClick}>+</div>
       </div>
     );
   }
@@ -62,46 +65,32 @@ class InputMultipleValues extends React.Component {
   
   @autobind
   handleAddClick() {
-    this.setState(state => {
-      return {
-        ...state,
-        nbInputs: state.nbInputs+1,
-      };
-    });
+    const props = this.props;
+    props.onChange([
+      ...props.values,
+      '',
+    ]);
   }
   
   @autobind
   handleRemoveClick(e) {
-    this.setState(state => {
-      return {
-        ...state,
-        nbInputs: state.nbInputs-1,
-      };
-    });
-    /*const indexToRemove = parseInt(e.currentTarget.getAttribute('data-index'));
-    this.setState(state => {
-      const newValues = state.values.filter((a, index) => index !== indexToRemove);
-      return {
-        ...state,
-        values: newValues,
-      };
-    }, () => {
-      props.onChange(this.state.values);
-    });*/
+    const props = this.props;
+    const indexToRemove = parseInt(e.currentTarget.getAttribute('data-index'));
+    const newValues = props.values.filter((a, index) => index !== indexToRemove);
+    props.onChange(newValues);
   }
 }
 
 //language=SCSS
 InputMultipleValues = Styled(InputMultipleValues)`
 & {
-  .input-multiple-values__add, .input-multiple-values__remove {
+  .input-multiple-values__add, .input-multiple-values__remove, .input-multiple-values__placeholder {
     float: right;
-    cursor: pointer;
     font-size: 24px;
     width: 21px;
     height: 21px;
     line-height: 21px;
-    margin-left: 3px;
+    margin-left: 2px;
     margin-top: 2px;
     text-align: center;
     
@@ -110,9 +99,13 @@ InputMultipleValues = Styled(InputMultipleValues)`
       border-radius: 100px;
     }
   }
+
+  .input-multiple-values__add, .input-multiple-values__remove {
+    cursor: pointer;
+  }
   
   input {
-    width: 145px;
+    width: 100%;
   }
 }
 `;

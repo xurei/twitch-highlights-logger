@@ -25,6 +25,7 @@ class VideoView extends React.Component {
         filterMatchingCount: 0,
         filterThreshold: 15,
         windowLength: 120,
+        rollback: 20,
         chatVisible: true,
     };
     videoInterval = null;
@@ -52,6 +53,7 @@ class VideoView extends React.Component {
         let lastFilter = LocalStorage.get('LAST_FILTER_USED', ['copainLUL']);
         const lastThreshold = LocalStorage.get('LAST_THRESHOLD_USED', 3);
         const lastWindowLength = LocalStorage.get('LAST_WINDOW_LENGTH', 120);
+        const lastRollback = LocalStorage.get('LAST_ROLLBACK', 20);
         
         if (typeof(lastFilter) === 'string') {
             lastFilter = [ lastFilter ];
@@ -62,6 +64,7 @@ class VideoView extends React.Component {
             filterValues: lastFilter,
             filterThreshold: lastThreshold,
             windowLength: lastWindowLength,
+            rollback: lastRollback,
         }));
         
         global.ipc.on('chatlog', (event, chatlog) => {
@@ -82,6 +85,7 @@ class VideoView extends React.Component {
             if (prevState.filterValues !== state.filterValues
             ||  prevState.userValue !== state.userValue
             ||  prevState.filterThreshold !== state.filterThreshold
+            ||  prevState.rollback !== state.rollback
             ||  prevState.windowLength !== state.windowLength) {
                 this.applyFilter();
             }
@@ -119,7 +123,7 @@ class VideoView extends React.Component {
         LocalStorage.set('LAST_FILTER_USED', state.filterValues);
         LocalStorage.set('LAST_THRESHOLD_USED', state.filterThreshold);
         LocalStorage.set('LAST_WINDOW_LENGTH', state.windowLength);
-        const ranges = slidingWindow(chatlog, state.windowLength, state.filterThreshold);
+        const ranges = slidingWindow(chatlog, state.windowLength, state.filterThreshold, state.rollback);
         console.log(ranges);
     
         this.setState(state => ({
@@ -190,7 +194,7 @@ class VideoView extends React.Component {
         return (
             <div className={props.className} id="video_view">
                 <div className="flex-main">
-                    <div className="flex-child" style={{width: '85%', flexGrow: 1}}>
+                    <div className="flex-child" style={{width: 100, flexGrow: 1}}>
                         <div id="main-player"/>
                     </div>
                     <div className="sidebar">
@@ -213,14 +217,33 @@ class VideoView extends React.Component {
                                     <span className="filters-box__input-name">
                                         Window length:
                                     </span>
-                                    <input type="number" className="filters-box__input" value={state.windowLength} onChange={(e) => {
-                                        e.preventDefault();
-                                        const val = e.currentTarget.value;
-                                        this.setState(state => ({
-                                            ...state,
-                                            windowLength: Math.max(10, parseInt(val)),
-                                        }));
-                                    }} />
+                                    <div className="input-seconds">
+                                        <input type="number" className="filters-box__input" value={state.windowLength} onChange={(e) => {
+                                            e.preventDefault();
+                                            const val = e.currentTarget.value;
+                                            this.setState(state => ({
+                                                ...state,
+                                                windowLength: Math.max(10, parseInt(val)),
+                                            }));
+                                        }} />
+                                    </div>
+                                </div>
+                                <div>
+                                    <span className="filters-box__input-name">
+                                        Rollback:
+                                    </span>
+                                    <div className="input-seconds">
+                                        <input type="number" className="filters-box__input" value={state.rollback} onChange={(e) => {
+                                            e.preventDefault();
+                                            const val = e.currentTarget.value;
+                                            const rollback = Math.max(0, parseInt(val));
+                                            this.setState(state => ({
+                                                ...state,
+                                                rollback: rollback,
+                                            }));
+                                            LocalStorage.set('LAST_ROLLBACK', rollback);
+                                        }} />
+                                    </div>
                                 </div>
                                 <div>
                                     <span className="filters-box__input-name">
@@ -396,11 +419,11 @@ VideoView = Styled(VideoView)`
         }
         
         .input-seconds {
+            display: inline-block;
             &:after {
                 content: "s";
                 display: inline-block;
-                position: absolute;
-                right: 22px;
+                margin-left: 4px;
                 color: #aaa;
                 font-size: 0.8em;
             }

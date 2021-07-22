@@ -41,4 +41,6 @@ You can select the highlight in the UI and the video will jump to this moment.
 This app has been originally created for [Copain du Web](https://www.twitch.tv/copainduweb/).
 
 ## Support Open-Source ♥
-Support my work on https://github.com/sponsors/xurei
+Support my work on 
+- Tipeee : https://fr.tipeee.com/xureilab
+- Github Sponsors : https://github.com/sponsors/xurei

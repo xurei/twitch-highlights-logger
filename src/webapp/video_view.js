@@ -101,7 +101,6 @@ class VideoView extends React.Component {
     
     applyFilter() {
         const state = this.state;
-        const THRESHOLD = state.filterThreshold;
         const chatlog = state.chatlog.filter((chatline) => {
             if (!chatline.message || !chatline.message.body) {
                 return false;
@@ -122,10 +121,10 @@ class VideoView extends React.Component {
             }
         });
         console.log('Filtered chatlog', chatlog);
-        console.log('Threshold:', THRESHOLD);
         LocalStorage.set('LAST_FILTER_USED', state.filterValues);
         LocalStorage.set('LAST_THRESHOLD_USED', state.filterThreshold);
         LocalStorage.set('LAST_WINDOW_LENGTH', state.windowLength);
+        LocalStorage.set('LAST_ROLLBACK', state.rollback);
         const ranges = slidingWindow(chatlog, state.windowLength, state.filterThreshold, state.rollback);
         console.log(ranges);
     
@@ -207,12 +206,18 @@ class VideoView extends React.Component {
                                     <span className="filters-box__input-name">
                                         Threshold:
                                     </span>
-                                    <input type="number" className="filters-box__input" value={state.filterThreshold} onChange={(e) => {
+                                    <input type="number" className="filters-box__input" placeholder="1" value={state.filterThreshold} onChange={(e) => {
                                         e.preventDefault();
-                                        const val = e.currentTarget.value;
+                                        let val = parseInt(e.currentTarget.value);
+                                        if (isNaN(val)) {
+                                            val = null;
+                                        }
+                                        else {
+                                            val = Math.max(1, val);
+                                        }
                                         this.setState(state => ({
                                             ...state,
-                                            filterThreshold: Math.max(1, parseInt(val)),
+                                            filterThreshold: val,
                                         }));
                                     }} />
                                 </div>
@@ -221,12 +226,18 @@ class VideoView extends React.Component {
                                         Window length:
                                     </span>
                                     <div className="input-seconds">
-                                        <input type="number" className="filters-box__input" value={state.windowLength} onChange={(e) => {
+                                        <input type="number" className="filters-box__input" placeholder="1" value={state.windowLength} onChange={(e) => {
                                             e.preventDefault();
-                                            const val = e.currentTarget.value;
+                                            let val = parseInt(e.currentTarget.value);
+                                            if (isNaN(val)) {
+                                                val = null;
+                                            }
+                                            else {
+                                                val = Math.max(1, val);
+                                            }
                                             this.setState(state => ({
                                                 ...state,
-                                                windowLength: Math.max(10, parseInt(val)),
+                                                windowLength: val,
                                             }));
                                         }} />
                                     </div>
@@ -236,15 +247,19 @@ class VideoView extends React.Component {
                                         Rollback:
                                     </span>
                                     <div className="input-seconds">
-                                        <input type="number" className="filters-box__input" value={state.rollback} onChange={(e) => {
+                                        <input type="number" className="filters-box__input" placeholder="0" value={state.rollback} onChange={(e) => {
                                             e.preventDefault();
-                                            const val = e.currentTarget.value;
-                                            const rollback = Math.max(0, parseInt(val));
+                                            let val = parseInt(e.currentTarget.value);
+                                            if (isNaN(val)) {
+                                                val = null;
+                                            }
+                                            else {
+                                                val = Math.max(0, val);
+                                            }
                                             this.setState(state => ({
                                                 ...state,
-                                                rollback: rollback,
+                                                rollback: val,
                                             }));
-                                            LocalStorage.set('LAST_ROLLBACK', rollback);
                                         }} />
                                     </div>
                                 </div>

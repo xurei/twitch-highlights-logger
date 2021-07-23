@@ -15,4 +15,4 @@ echo "Purging useless libs..."
 #rm -rf $BASEPATH/dist_packages/win-unpacked/vulkan-1.dll || true
 
 ## Create Setup file
-node_modules/.bin/electron-builder --prepackaged=dist_packages/win-unpacked --win --p always
+node_modules/.bin/electron-builder --prepackaged=dist_packages/win-unpacked --win --p onTagOrDraft

@@ -19,4 +19,4 @@ node_modules/.bin/electron-builder --dir --mac
 #rm -rf $BASEPATH/dist_packages/linux-unpacked/libvk_swiftshader.so || true
 
 # Create AppImage
-node_modules/.bin/electron-builder --prepackaged=dist_packages/linux-unpacked --mac --p onTagOrDraft
+node_modules/.bin/electron-builder --prepackaged=dist_packages/mac-unpacked --mac --p onTagOrDraft

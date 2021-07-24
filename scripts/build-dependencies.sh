@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-BASEPATH=$(realpath $(dirname $0))
+myrealpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
+BASEPATH=$(myrealpath $(dirname $0))
 
 # Build production package.json
 node $BASEPATH/build_package_json.js

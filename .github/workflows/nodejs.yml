@@ -47,3 +47,21 @@ jobs:
           # This token is provided by Actions, you do not need to create your own token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           USE_HARD_LINKS: false
+
+  release-macos:
+    runs-on: macos-11
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v2
+      #- run: echo "${{ github.ref }}"
+      - run: npm i
+      - run: npm i --save-dev dmg-license
+      - run: mkdir build
+      - run: npm run build:dependencies
+      - run: npm run build
+      - run: npm run package:macos
+        env:
+          # This token is provided by Actions, you do not need to create your own token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USE_HARD_LINKS: false

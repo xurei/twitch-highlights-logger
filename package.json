@@ -11,6 +11,7 @@
     "watch": "bash scripts/watch.sh",
     "package:linux": "bash scripts/package-linux.sh",
     "package:windows": "bash scripts/package-windows.sh",
+    "package:macos": "bash scripts/package-macos.sh",
     "serve": "npm run build; electron build & webpack --watch"
   },
   "author": "Olivier Bourdoux <olivier.bourdoux@gmail.com>",

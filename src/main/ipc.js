@@ -8,9 +8,15 @@ module.exports = {
         const mainWindow = require('./main-window');
         ipc.on('load_chatlog', function(event, arg) {
             console.log(arg);
-            twitchChatProvider.loadChatlog(arg).then(data => {
+            twitchChatProvider.loadChatlog(arg).then(chatlog => {
+                chatlog.onFetchProgress((progress) => {
+                    console.log(`Progress: ${progress}%`);
+                    mainWindow.webContents.send('chatlogProgress', progress);
+                });
+                chatlog.onFetchComplete(() => {
+                    mainWindow.webContents.send('chatlog', chatlog.payload.comments);
+                });
                 console.log('Sending logs to main view');
-                mainWindow.webContents.send('chatlog', data);
                 return;
             })
             .catch(e => {

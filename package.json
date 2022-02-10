@@ -47,7 +47,6 @@
     "node-fetch": "^2.6.1",
     "prop-types": "^15.7.2",
     "semver": "^7.3.4",
-    "twitch-chatlog": "^6.1.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
@@ -78,11 +77,11 @@
     "eslint-plugin-xurei": "^1.0.0",
     "html-webpack-plugin": "^4.5.2",
     "mocha": "^8.3.0",
-    "node-sass": "^4.14.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-is": "^16.8.0",
-    "sass-loader": "^8.0.2",
+    "sass": "^1.49.7",
+    "sass-loader": "^10.2.1",
     "store": "^2.0.12",
     "style-loader": "^2.0.0",
     "styled-components": "^5.2.1",

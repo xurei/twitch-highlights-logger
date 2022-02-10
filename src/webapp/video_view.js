@@ -16,7 +16,8 @@ class VideoView extends React.Component {
         video_id: PropTypes.string.isRequired,
     };
     state = {
-        chatlog_ready: false,
+        chatlogReady: false,
+        chatlogProgress: 0,
         chatlog: null,
         ranges: null,
         time: 0,
@@ -73,10 +74,16 @@ class VideoView extends React.Component {
         global.ipc.on('chatlog', (event, chatlog) => {
             this.setState(state => ({
                 ...state,
-                chatlog_ready: true,
+                chatlogReady: true,
                 chatlog: chatlog,
             }));
             this.applyFilter();
+        });
+        global.ipc.on('chatlogProgress', (event, progress) => {
+            this.setState(state => ({
+                ...state,
+                chatlogProgress: progress,
+            }));
         });
     
         global.postMessage({ action: 'load_chatlog', data: props.video_id }, '*');
@@ -84,7 +91,7 @@ class VideoView extends React.Component {
     
     componentDidUpdate(prevProps, prevState) {
         const state = this.state;
-        if (state.chatlog_ready) {
+        if (state.chatlogReady) {
             if (prevState.filterValues !== state.filterValues
             ||  prevState.userValue !== state.userValue
             ||  prevState.filterThreshold !== state.filterThreshold
@@ -107,7 +114,7 @@ class VideoView extends React.Component {
             }
             else {
                 const msg = chatline.message.body.toLowerCase();
-                const user = chatline.commenter.display_name.toLowerCase();
+                const user = chatline.commenter.toLowerCase();
                 
                 const foundMatchingValue = state.filterValues.some(filterValue => {
                     return filterValue && msg.indexOf(filterValue.toLowerCase()) !== -1;
@@ -289,15 +296,15 @@ class VideoView extends React.Component {
                                 <div>{(state.ranges || []).length} ranges found</div>
                             </FlexChild>
                             <FlexChild height={0} grow={1} className="overflow-y-scroll">
-                                {!state.chatlog_ready ? (
-                                    <div className="block-padder">Loading chatlog...</div>
+                                {!state.chatlogReady ? (
+                                    <div className="block-padder">Loading chatlog... {parseInt(state.chatlogProgress)}%</div>
                                 ) : (
                                     <div className="block-padder" style={{height: '100%'}}>
                                         {rangeWidgets}
                                     </div>
                                 )}
                             </FlexChild>
-                            {state.chatlog_ready && (
+                            {state.chatlogReady && (
                                 <FlexChild height={36} grow={0} className="chat-toggle">
                                     <button className={`chat__toggle-btn ${state.chatVisible ? '' : 'hidden'}`}
                                             onClick={this.handleVisibilityToggle}>
@@ -305,7 +312,7 @@ class VideoView extends React.Component {
                                     </button>
                                 </FlexChild>
                             )}
-                            {state.chatlog_ready && (
+                            {state.chatlogReady && (
                                 <FlexChild height={0} grow={state.chatVisible ? 3 : 0} className="chat-block overflow-y-scroll">
                                     <div className="fullh">
                                         {state.chatlog && (

@@ -22,7 +22,7 @@ class Chatlog extends React.Component {
                     </span>
                     &nbsp;
                     <span className="chatline__user" style={{color: chatline.message.user_color}}>
-                        {chatline.commenter.display_name}
+                        {chatline.commenter}
                     </span>
                     :&nbsp;
                     <span>

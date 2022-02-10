@@ -7,55 +7,95 @@ import { secondsToTime } from './seconds_to_time';
 class Chatlog extends React.Component {
   static propTypes = {
     chatlog: PropTypes.array.isRequired,
+    time: PropTypes.number.isRequired,
+    autoscroll: PropTypes.bool.isRequired,
   };
+  
+  chatLines = null;
+  
+  constructor(props) {
+    super(props);
+    this.prepareChatlines();
+  }
+  
+  prepareChatlines() {
+    const props = this.props;
+    this.chatLines = props.chatlog.map(chatline => {
+      try {
+        return {
+          id: chatline._id,
+          time: chatline.content_offset_seconds,
+          element: (
+            <div className="chatline" data-key={chatline._id} key={chatline._id}>
+              <span className="chatline__time">
+                {secondsToTime(chatline.content_offset_seconds)}
+              </span>
+              &nbsp;
+              <span className="chatline__user" style={{color: chatline.message.user_color}}>
+                {chatline.commenter}
+              </span>
+              :&nbsp;
+              <span>
+                {!chatline.message.fragments ? chatline.message.body : chatline.message.fragments.map((fragment, index) => {
+                  if (fragment.emoticon) {
+                    return (
+                      <span key={`${chatline._id}-${index}`} className="chatlog__img-wrapper">
+                        <div className="chatlog__img-wrapper-tooltip">
+                          {fragment.text}
+                        </div>
+                        <img width={28} src={`https://static-cdn.jtvnw.net/emoticons/v2/${fragment.emoticon.emoticon_id}/default/dark/2.0`} alt={fragment.text}/>
+                      </span>
+                    );
+                  }
+                  else if (fragment.text) {
+                    return fragment.text;
+                  }
+                })}
+                {/*{chatline.message.body}*/}
+              </span>
+            </div>
+          )
+        };
+      }
+      catch (e) {
+        return 'ERR';
+      }
+    });
+  }
   
   render() {
     const props = this.props;
     return (
       <div className={props.className}>
-        {props.chatlog.map(chatline => {
-            try {
-              return (
-                <div className="chatline">
-                    <span className="chatline__time">
-                        {secondsToTime(chatline.content_offset_seconds)}
-                    </span>
-                    &nbsp;
-                    <span className="chatline__user" style={{color: chatline.message.user_color}}>
-                        {chatline.commenter}
-                    </span>
-                    :&nbsp;
-                    <span>
-                        {!chatline.message.fragments ? chatline.message.body : chatline.message.fragments.map((fragment, index) => {
-                          if (fragment.emoticon) {
-                            return (
-                              <span key={`${chatline._id}-${index}`} className="chatlog__img-wrapper">
-                                <div className="chatlog__img-wrapper-tooltip">
-                                  {fragment.text}
-                                </div>
-                                <img width={28} src={`https://static-cdn.jtvnw.net/emoticons/v2/${fragment.emoticon.emoticon_id}/default/dark/2.0`} alt={fragment.text}/>
-                              </span>
-                            );
-                          }
-                          else if (fragment.text) {
-                            return fragment.text;
-                          }
-                        })}
-                        {/*{chatline.message.body}*/}
-                    </span>
-                </div>
-              );
-            }
-            catch (e) {
-              return 'ERR';
-            }
-        })}
+        {this.chatLines.map(chatline => chatline.element)}
       </div>
     );
   }
   
+  handleAutoScroll(time) {
+    const firstChatlineIndex = this.chatLines.findIndex((chatline) => chatline.time >= time);
+    const firstChatline = this.chatLines[Math.max(0, firstChatlineIndex-1)];
+    if (firstChatline) {
+      document.querySelector(`[data-key="${firstChatline.id}"]`).scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+      });
+    }
+    console.log(time, firstChatline);
+  }
+  
   shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
+    const props = this.props;
+    if (nextProps.time !== props.time && props.autoscroll) {
+      this.handleAutoScroll(nextProps.time);
+    }
+    if (!deepEqual(this.props.chatlog, nextProps.chatlog)) {
+      this.prepareChatlines();
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 }
 

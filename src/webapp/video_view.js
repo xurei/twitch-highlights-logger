@@ -28,6 +28,7 @@ class VideoView extends React.Component {
         windowLength: 120,
         rollback: 20,
         chatVisible: true,
+        autoscroll: true,
     };
     videoInterval = null;
     
@@ -306,17 +307,23 @@ class VideoView extends React.Component {
                             </FlexChild>
                             {state.chatlogReady && (
                                 <FlexChild height={36} grow={0} className="chat-toggle">
-                                    <button className={`chat__toggle-btn ${state.chatVisible ? '' : 'hidden'}`}
-                                            onClick={this.handleVisibilityToggle}>
-                                        Chat
-                                    </button>
+                                    <FlexLayout direction="row" className="fullw">
+                                        <FlexChild grow={1}>
+                                            <button className={`chat__toggle-btn ${state.chatVisible ? '' : 'hidden'}`} onClick={this.handleVisibilityToggle}>
+                                                Chat
+                                            </button>
+                                        </FlexChild>
+                                        <FlexChild className="autoscroll-wrapper" grow={0}>
+                                            <label><input type="checkbox" checked={state.autoscroll} onChange={this.handleAutoscrollToggle}/> autoscroll</label>
+                                        </FlexChild>
+                                    </FlexLayout>
                                 </FlexChild>
                             )}
                             {state.chatlogReady && (
                                 <FlexChild height={0} grow={state.chatVisible ? 3 : 0} className="chat-block overflow-y-scroll">
                                     <div className="fullh">
                                         {state.chatlog && (
-                                          <Chatlog chatlog={state.chatlog}/>
+                                          <Chatlog chatlog={state.chatlog} time={state.time} autoscroll={state.autoscroll}/>
                                         )}
                                         {/*<pre>{JSON.stringify(state.chatlog, null, '  ')}</pre>*/}
                                     </div>
@@ -331,6 +338,14 @@ class VideoView extends React.Component {
                 </div>
             </div>
         );
+    }
+    
+    @autobind
+    handleAutoscrollToggle() {
+        this.setState(state => ({
+            ...state,
+            autoscroll: !state.autoscroll,
+        }));
     }
     
     @autobind
@@ -464,6 +479,13 @@ VideoView = Styled(VideoView)`
         
         &.visible {
             visibility: visible;
+        }
+    }
+    
+    .autoscroll-wrapper {
+        padding: 8px;
+        label, input {
+            cursor: pointer;
         }
     }
     

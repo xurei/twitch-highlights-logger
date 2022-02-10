@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'nonce-devtools';">
     <title>Twitch Highlights</title>
 </head>
 <body style="margin: 0">
@@ -12,7 +13,7 @@
     </div>
 </div>
 <div id="content"></div>
-<script>
+<script nonce="devtools">
     document.addEventListener("keydown", function (e) {
         if (e.which === 123) { // F12
             window.postMessage({ action: 'devtools'}, '*');

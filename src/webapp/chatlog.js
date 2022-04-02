@@ -4,9 +4,6 @@ import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
 import { secondsToTime } from './seconds_to_time';
 
-//eslint-ignore no-undef
-const document = document || {};
-
 class Chatlog extends React.Component {
   static propTypes = {
     chatlog: PropTypes.array.isRequired,
@@ -79,7 +76,7 @@ class Chatlog extends React.Component {
     const firstChatlineIndex = this.chatLines.findIndex((chatline) => chatline.time >= time);
     const firstChatline = this.chatLines[Math.max(0, firstChatlineIndex-1)];
     if (firstChatline) {
-      document.querySelector(`[data-key="${firstChatline.id}"]`).scrollIntoView({
+      document.querySelector(`[data-key="${firstChatline.id}"]`).scrollIntoView({ //eslint-disable-line no-undef
         behavior: 'smooth',
         block: 'end',
       });

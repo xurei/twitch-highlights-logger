@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: npm i
+      - run: npm ci
       - run: npm run lint
       - run: npm run test
       - run: rm -rf build || true; mkdir build
@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       #- run: echo "${{ github.ref }}"
-      - run: npm i
+      - run: npm ci
       - run: mkdir build
       - run: npm run build:dependencies
       - run: npm run build
@@ -55,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       #- run: echo "${{ github.ref }}"
-      - run: npm i
+      - run: npm ci
       - run: npm i --save-dev dmg-license
       - run: mkdir build
       - run: npm run build:dependencies

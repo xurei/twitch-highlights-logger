@@ -6,7 +6,7 @@ export function buildSimulatedEventChange(name, value, attributes = {}) {
         value: value,
         getAttribute: (n) => {
             return attributes[n];
-        }
+        },
     };
     return event;
 }

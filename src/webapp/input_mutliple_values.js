@@ -1,7 +1,6 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
-import deepEqual from 'deep-eql';
 import autobind from 'autobind-decorator';
 import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
 
@@ -13,14 +12,12 @@ class InputMultipleValues extends React.Component {
   
   render() {
     const props = this.props;
-    const state = this.state;
-    
     const inputs = [];
     const nbInputs = props.values.length;
     
     for (let index=0; index<nbInputs; ++index) {
       const value = props.values[index] || '';
-      inputs.push(
+      inputs.push((
         <div key={index}>
           <FlexLayout direaction="row">
             <FlexChild grow={1} width={1}>
@@ -40,7 +37,7 @@ class InputMultipleValues extends React.Component {
             </FlexChild>
           </FlexLayout>
         </div>
-      );
+      ));
     }
     
     return (

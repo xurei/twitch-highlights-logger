@@ -1,10 +1,10 @@
 const ipc = require('electron').ipcMain;
 const shell = require('electron').shell;
 const twitchChatProvider = require('./providers/twitch-chat-provider');
-const debug = require('debug')('twitch-highlights-ipc');
+//const debug = require('debug')('twitch-highlights-ipc');
 
 module.exports = {
-    start: function(app) {
+    start: function() {
         const mainWindow = require('./main-window');
         ipc.on('load_chatlog', function(event, arg) {
             console.log(arg);

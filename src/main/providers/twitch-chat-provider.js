@@ -29,7 +29,7 @@ class Chatlog {
         const out = {
             version: payloadVersion,
             meta: this._videoMeta,
-            comments: this._comments
+            comments: this._comments,
         };
         delete out.meta['thumbnails'];
         delete out.meta['fps'];
@@ -49,20 +49,20 @@ class Chatlog {
     }
     
     async fetchComments() {
-        const fetchSegment = async (cursor) => {
-            console.log('Fetching at ' + cursor);
+        const fetchSegment = async(cursor) => {
+            console.log(`Fetching at ${cursor}`);
             let args = 'content_offset_seconds=0';
             if (cursor) {
                 args = `cursor=${cursor}`;
             }
             const resp = await fetch(`https://api.twitch.tv/v5/videos/${this.videoID}/comments?${args}`, {
                 headers: {
-                    "Client-ID": clientID,
-                    "Accept": "application/vnd.twitchtv.v5+json; charset=UTF-8"
-                }
+                    'Client-ID': clientID,
+                    'Accept': 'application/vnd.twitchtv.v5+json; charset=UTF-8',
+                },
             });
             return await resp.json();
-        }
+        };
         
         let shouldContinue = true;
         let cursor = null;
@@ -177,9 +177,9 @@ function shortenComment(comment) {
 async function fetchVideoMeta(videoID) {
     const resp = await fetch(`https://api.twitch.tv/v5/videos/${videoID}`, {
         headers: {
-            "Client-ID": clientID,
-            "Accept": "application/vnd.twitchtv.v5+json; charset=UTF-8"
-        }
+            'Client-ID': clientID,
+            'Accept': 'application/vnd.twitchtv.v5+json; charset=UTF-8',
+        },
     });
     return await resp.json();
 }

@@ -123,8 +123,8 @@ class VideoView extends React.Component {
                 
                 return (
                     //(!state.filterValues || state.filterValue === '' || msg.indexOf(state.filterValue.toLowerCase()) !== -1)
-                   foundMatchingValue
-                && (!state.userValue || state.userValue === '' || user.indexOf(state.userValue.toLowerCase()) !== -1)
+                    foundMatchingValue &&
+                    (!state.userValue || state.userValue === '' || user.indexOf(state.userValue.toLowerCase()) !== -1)
                 );
             }
         });
@@ -323,7 +323,7 @@ class VideoView extends React.Component {
                                 <FlexChild height={0} grow={state.chatVisible ? 3 : 0} className="chat-block overflow-y-scroll">
                                     <div className="fullh">
                                         {state.chatlog && (
-                                          <Chatlog chatlog={state.chatlog} time={state.time} autoscroll={state.autoscroll}/>
+                                            <Chatlog chatlog={state.chatlog} time={state.time} autoscroll={state.autoscroll}/>
                                         )}
                                         {/*<pre>{JSON.stringify(state.chatlog, null, '  ')}</pre>*/}
                                     </div>

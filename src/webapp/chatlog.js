@@ -4,6 +4,9 @@ import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
 import { secondsToTime } from './seconds_to_time';
 
+//eslint-ignore no-undef
+const document = document || {};
+
 class Chatlog extends React.Component {
   static propTypes = {
     chatlog: PropTypes.array.isRequired,
@@ -54,7 +57,7 @@ class Chatlog extends React.Component {
                 {/*{chatline.message.body}*/}
               </span>
             </div>
-          )
+          ),
         };
       }
       catch (e) {

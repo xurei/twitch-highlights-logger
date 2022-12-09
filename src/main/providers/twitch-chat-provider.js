@@ -1,8 +1,9 @@
+import process from 'node:process';
 import storage from 'electron-json-storage';
 import fetch from 'node-fetch';
 
 const clientID = 'kimne78kx3ncx6brgo4mv6wki5h1ko'; // From Twitch website (2022-02-09)
-const payloadVersion = 1; // Version of the data to be compared with the cache. If different, a refetch is performed
+const payloadVersion = 2; // Version of the data to be compared with the cache. If different, a refetch is performed
 
 class Chatlog {
     _videoMeta;
@@ -36,6 +37,20 @@ class Chatlog {
         
         return out;
     }
+
+    static updateCache(cacheData) {
+        //Version update from 1 to 2 - commenter rewrite
+        if (cacheData.version === 1) {
+            cacheData.comments.forEach(comment => {
+                comment.commenter = {
+                    id: -1,
+                    login: comment.commenter.toLowerCase(),
+                    displayName: comment.commenter,
+                }
+            });
+            cacheData.version = 2;
+        }
+    }
     
     static fromCache(cacheData) {
         const out = new Chatlog(cacheData.meta);
@@ -51,32 +66,49 @@ class Chatlog {
     async fetchComments() {
         const fetchSegment = async(cursor) => {
             console.log(`Fetching at ${cursor}`);
-            let args = 'content_offset_seconds=0';
+            const vars = {'videoID': `${this.videoID}`};
             if (cursor) {
-                args = `cursor=${cursor}`;
+                vars.cursor = cursor;
             }
-            const resp = await fetch(`https://api.twitch.tv/v5/videos/${this.videoID}/comments?${args}`, {
+            else {
+                vars.contentOffsetSeconds = 0;
+            }
+
+            const resp = await fetch(`https://gql.twitch.tv/gql`, {
+                method: 'POST',
+                body: JSON.stringify([{
+                    'operationName': 'VideoCommentsByOffsetOrCursor',
+                    'variables': vars,
+                    'extensions': {
+                        'persistedQuery': {
+                            'version': 1,
+                            'sha256Hash': 'b70a3591ff0f4e0313d126c6a1502d79a1c02baebb288227c582044aa76adf6a'
+                        }
+                    }
+                }]),
                 headers: {
                     'Client-ID': clientID,
                     'Accept': 'application/vnd.twitchtv.v5+json; charset=UTF-8',
                 },
             });
-            return await resp.json();
+            return (await resp.json())[0].data.video;
         };
         
         let shouldContinue = true;
         let cursor = null;
         while (shouldContinue) {
             const data = await fetchSegment(cursor);
-            const comments = data.comments;
+            console.log(data);
+            const comments = data.comments.edges;
+            const pageInfo = data.comments.pageInfo;
             comments.forEach(comment => {
-                shortenComment(comment);
-                this._comments.push(comment);
+                comment = shortenComment(comment.node);
+                this._comments[this._comments.length] = comment;
             });
             //noinspection JSUnresolvedVariable
-            shouldContinue = !!data._next;
+            shouldContinue = pageInfo.hasNextPage;
             //noinspection JSUnresolvedVariable
-            cursor = data._next;
+            cursor = comments[0].cursor;
             
             if (this._comments.length > 0) {
                 this._fetchedTime = this._comments[this._comments.length-1].content_offset_seconds;
@@ -123,6 +155,9 @@ const provider = {
                     reject(error);
                 }
                 else {
+                    if (cachedData !== null && Object.keys(cachedData).length > 0) {
+                        Chatlog.updateCache(cachedData);
+                    }
                     if (cachedData !== null && Object.keys(cachedData).length > 0 && cachedData.version === payloadVersion) {
                         console.log('FROM CACHE');
                         const chatlog = Chatlog.fromCache(cachedData);
@@ -131,7 +166,7 @@ const provider = {
                     }
                     else {
                         console.log('FETCHING...');
-    
+                        
                         let videoMeta;
                         try {
                             videoMeta = await fetchVideoMeta(videoID);
@@ -161,17 +196,48 @@ const provider = {
 
 function shortenComment(comment) {
     // Twitch is sending an absolutely stupid amount of rendundant data FOR EACH MESSAGE
-    // This function reduce each message data so we don't the the freaking Biography of each commenter each time
+    // This function reduce each message data, so we don't write the freaking Biography of each commenter each time
     // (among other things)
-    
-    //noinspection JSUnresolvedVariable
-    delete comment['updated_at'];
-    delete comment['channel_id'];
-    delete comment['content_type'];
-    delete comment['content_id'];
-    comment['commenter'] = comment['commenter']['display_name'];
-    delete comment['message']['emoticons'];
-    delete comment['source'];
+
+    // //noinspection JSUnresolvedVariable
+    // delete comment['updated_at'];
+    // delete comment['channel_id'];
+    // delete comment['content_type'];
+    // delete comment['content_id'];
+    // comment['commenter'] = comment['commenter']['display_name'];
+    // delete comment['message']['emoticons'];
+    // delete comment['source'];
+
+    if (!comment.message.fragments) {
+        console.error('No fragments !');
+        process.exit(1);
+    }
+
+    const out = {
+        _id: comment.id,
+        created_at: comment.createdAt,
+        content_offset_seconds: comment.contentOffsetSeconds,
+        commenter: comment.commenter,
+        state: comment.state,
+        message: {
+            body: comment.message.fragments.map(fragment => fragment.text).join(''),
+            fragments: comment.message.fragments.map(fragment => {
+                const out = {
+                    text: fragment.text,
+                };
+                if (fragment.emote) {
+                    out.emoticon = {
+                        "emoticon_id": fragment.emote.emoteID,
+                    };
+                }
+                return out;
+            }),
+            user_color: comment.message.userColor,
+        }
+    };
+
+    delete out.commenter.__typename;
+    return out;
 }
 
 async function fetchVideoMeta(videoID) {

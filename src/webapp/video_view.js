@@ -71,7 +71,7 @@ class VideoView extends React.Component {
             this.player.setMuted(false);
         }, 2000);
         this.videoInterval = setInterval(this.updatePlayer.bind(this), 500);
-    
+        
         global.ipc.on('chatlog', (event, chatlog) => {
             this.setState(state => ({
                 ...state,
@@ -86,7 +86,7 @@ class VideoView extends React.Component {
                 chatlogProgress: progress,
             }));
         });
-    
+        
         global.postMessage({ action: 'load_chatlog', data: props.video_id }, '*');
     }
     
@@ -115,7 +115,7 @@ class VideoView extends React.Component {
             }
             else {
                 const msg = chatline.message.body.toLowerCase();
-                const user = chatline.commenter.toLowerCase();
+                const user = chatline.commenter.login;
                 
                 const foundMatchingValue = state.filterValues.some(filterValue => {
                     return filterValue && msg.indexOf(filterValue.toLowerCase()) !== -1;
@@ -135,7 +135,7 @@ class VideoView extends React.Component {
         LocalStorage.set('LAST_ROLLBACK', state.rollback);
         const ranges = slidingWindow(chatlog, state.windowLength, state.filterThreshold, state.rollback);
         console.log(ranges);
-    
+        
         this.setState(state => ({
             ...state,
             ranges: ranges,

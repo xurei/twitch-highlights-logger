@@ -227,7 +227,7 @@ function shortenComment(comment) {
                 };
                 if (fragment.emote) {
                     out.emoticon = {
-                        "emoticon_id": fragment.emote.emoteID,
+                        emoticon_id: fragment.emote.emoteID,
                     };
                 }
                 return out;

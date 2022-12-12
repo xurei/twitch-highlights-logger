@@ -79,7 +79,7 @@ class Chatlog extends React.Component {
     const firstChatlineIndex = this.chatLines.findIndex((chatline) => chatline.time >= time);
     const firstChatline = this.chatLines[Math.max(0, firstChatlineIndex-1)];
     if (firstChatline) {
-      const element = document.querySelector(`[data-key="${firstChatline.id}"]`);
+      const element = document.querySelector(`[data-key="${firstChatline.id}"]`); //eslint-disable-line no-undef
       if (element) {
         element.scrollIntoView({ //eslint-disable-line no-undef
           behavior: 'smooth',

@@ -9,24 +9,27 @@ class Chatlog extends React.Component {
     chatlog: PropTypes.array.isRequired,
     time: PropTypes.number.isRequired,
     autoscroll: PropTypes.bool.isRequired,
+    matches: PropTypes.object.isRequired,
   };
   
   chatLines = null;
   
   constructor(props) {
     super(props);
-    this.prepareChatlines();
+    this.prepareChatlines(props);
   }
   
-  prepareChatlines() {
-    const props = this.props;
+  prepareChatlines(props) {
+    const matches = props.matches;
+    
     this.chatLines = props.chatlog.map(chatline => {
       try {
+        const lineMatches = matches[chatline._id]; //isMatch(chatline, props.matchText, props.matchUser);
         return {
           id: chatline._id,
           time: chatline.content_offset_seconds,
           element: (
-            <div className="chatline" data-key={chatline._id} key={chatline._id}>
+            <div className={`chatline ${lineMatches ? 'chatline__match' : ''}`} data-key={chatline._id} key={chatline._id}>
               <span className="chatline__time">
                 {secondsToTime(chatline.content_offset_seconds)}
               </span>
@@ -76,12 +79,17 @@ class Chatlog extends React.Component {
     const firstChatlineIndex = this.chatLines.findIndex((chatline) => chatline.time >= time);
     const firstChatline = this.chatLines[Math.max(0, firstChatlineIndex-1)];
     if (firstChatline) {
-      document.querySelector(`[data-key="${firstChatline.id}"]`).scrollIntoView({ //eslint-disable-line no-undef
-        behavior: 'smooth',
-        block: 'end',
-      });
+      const element = document.querySelector(`[data-key="${firstChatline.id}"]`);
+      if (element) {
+        element.scrollIntoView({ //eslint-disable-line no-undef
+          behavior: 'smooth',
+          block: 'end',
+        });
+      }
+      else {
+        console.error(`Element not found : [data-key="${firstChatline.id}"]`)
+      }
     }
-    console.log(time, firstChatline);
   }
   
   shouldComponentUpdate(nextProps) {
@@ -89,8 +97,8 @@ class Chatlog extends React.Component {
     if (nextProps.time !== props.time && props.autoscroll) {
       this.handleAutoScroll(nextProps.time);
     }
-    if (!deepEqual(this.props.chatlog, nextProps.chatlog)) {
-      this.prepareChatlines();
+    if (!deepEqual(props.chatlog, nextProps.chatlog) || !deepEqual(props.matches, nextProps.matches)) {
+      this.prepareChatlines(nextProps);
       return true;
     }
     else {
@@ -137,6 +145,11 @@ Chatlog = Styled(Chatlog)`
     line-height: 1.4em;
     word-break: break-word;
     font-size: 14px;
+    
+    &.chatline__match {
+      background: #891087;
+      text-shadow: 0.5px 0.5px 0 rgba(0,0,0,0.3), -0.5px 0.5px 0 rgba(0,0,0,0.3), 0.5px -0.5px 0 rgba(0,0,0,0.3), -0.5px -0.5px 0 rgba(0,0,0,0.3);
+    }
   }
 
   .chatline__time {

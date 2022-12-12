@@ -9,7 +9,7 @@ import autobind from 'autobind-decorator';
 import { Chatlog } from './chatlog';
 import { secondsToTime } from './seconds_to_time';
 import { InputMultipleValues } from './input_mutliple_values';
-
+import deepEqual from 'deep-eql';
 
 class VideoView extends React.Component {
     static propTypes = {
@@ -19,10 +19,11 @@ class VideoView extends React.Component {
         chatlogReady: false,
         chatlogProgress: 0,
         chatlog: null,
+        matches: {},
         ranges: null,
         time: 0,
         filterValues: [''],
-        userValue: '',
+        filterUsers: [''],
         filterMatchingCount: 0,
         filterThreshold: 15,
         windowLength: 120,
@@ -34,7 +35,8 @@ class VideoView extends React.Component {
     
     constructor(props) {
         super(props);
-        let lastFilter = LocalStorage.get('LAST_FILTER_USED', ['copainLUL']);
+        let lastFilter = LocalStorage.get('LAST_FILTER_USED', ['LUL']);
+        let lastFilterUsers = LocalStorage.get('LAST_FILTER_USED_USERS', ['']);
         const lastThreshold = LocalStorage.get('LAST_THRESHOLD_USED', 3);
         const lastWindowLength = LocalStorage.get('LAST_WINDOW_LENGTH', 120);
         const lastRollback = LocalStorage.get('LAST_ROLLBACK', 20);
@@ -46,6 +48,7 @@ class VideoView extends React.Component {
         this.state = {
             ...this.state,
             filterValues: lastFilter,
+            filterUsers: lastFilterUsers,
             filterThreshold: lastThreshold,
             windowLength: lastWindowLength,
             rollback: lastRollback,
@@ -93,8 +96,8 @@ class VideoView extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         const state = this.state;
         if (state.chatlogReady) {
-            if (prevState.filterValues !== state.filterValues
-            ||  prevState.userValue !== state.userValue
+            if (!deepEqual(prevState.filterValues, state.filterValues)
+            ||  !deepEqual(prevState.filterUsers, state.filterUsers)
             ||  prevState.filterThreshold !== state.filterThreshold
             ||  prevState.rollback !== state.rollback
             ||  prevState.windowLength !== state.windowLength) {
@@ -109,37 +112,52 @@ class VideoView extends React.Component {
     
     applyFilter() {
         const state = this.state;
+        const filterValues = state.filterValues.filter(v => v.trim().length > 0).map(v => v.trim().toLowerCase());
+        const filterUsers = state.filterUsers.filter(v => v.trim().length > 0).map(v => v.trim().toLowerCase());
+        const emptyFilterValues = filterValues.length === 0;
+        const emptyFilterUsers = filterUsers.length === 0;
         const chatlog = state.chatlog.filter((chatline) => {
             if (!chatline.message || !chatline.message.body) {
+                return false;
+            }
+            else if (emptyFilterValues && emptyFilterUsers) {
                 return false;
             }
             else {
                 const msg = chatline.message.body.toLowerCase();
                 const user = chatline.commenter.login;
                 
-                const foundMatchingValue = state.filterValues.some(filterValue => {
-                    return filterValue && msg.indexOf(filterValue.toLowerCase()) !== -1;
+                const foundMatchingUser = emptyFilterUsers || filterUsers.some(filterUser => {
+                    return filterUser === '' || user.indexOf(filterUser) !== -1;
                 });
                 
-                return (
-                    //(!state.filterValues || state.filterValue === '' || msg.indexOf(state.filterValue.toLowerCase()) !== -1)
-                    foundMatchingValue &&
-                    (!state.userValue || state.userValue === '' || user.indexOf(state.userValue.toLowerCase()) !== -1)
-                );
+                if (foundMatchingUser) {
+                    const foundMatchingValue = emptyFilterValues || filterValues.some(filterValue => {
+                        return filterValue === '' || msg.indexOf(filterValue) !== -1;
+                    });
+                    return (
+                        //(!state.filterValues || state.filterValue === '' || msg.indexOf(state.filterValue.toLowerCase()) !== -1)
+                      foundMatchingValue
+                    );
+                }
             }
         });
         console.log('Filtered chatlog', chatlog);
         LocalStorage.set('LAST_FILTER_USED', state.filterValues);
+        LocalStorage.set('LAST_FILTER_USED_USERS', state.filterUsers);
         LocalStorage.set('LAST_THRESHOLD_USED', state.filterThreshold);
         LocalStorage.set('LAST_WINDOW_LENGTH', state.windowLength);
         LocalStorage.set('LAST_ROLLBACK', state.rollback);
         const ranges = slidingWindow(chatlog, state.windowLength, state.filterThreshold, state.rollback);
         console.log(ranges);
         
+        const matches = chatlog.reduce((acc, msg) => { acc[msg._id] = true; return acc; }, {});
+        
         this.setState(state => ({
             ...state,
             ranges: ranges,
             filterMatchingCount: chatlog.length,
+            matches: matches,
         }));
     }
     
@@ -180,7 +198,7 @@ class VideoView extends React.Component {
                 playbackShown = true;
             }
             rangeWidgets.push(
-                <a key={range.start} href="javascript:" className={`highlight_range ${isRangePlaying ? 'active' : ''}`}
+                <a key={rstart} href="javascript:" className={`highlight_range ${isRangePlaying ? 'active' : ''}`}
                     onClick={() => {
                         this.player.play();
                         setTimeout(() => {
@@ -189,7 +207,7 @@ class VideoView extends React.Component {
                     }}
                 >
                     <span className={`playback-state`}>▶</span>
-                    {`${secondsToTime(rstart)} - ${secondsToTime(rend)}`}
+                    {`${secondsToTime(rstart)} - ${secondsToTime(rend)} (${range.nbMatches} messages)`}
                     {isRangePlaying && (
                         <div key="playback"><span className={`playback-state`}/>{secondsToTime(state.time)}</div>
                     )}
@@ -290,8 +308,22 @@ class VideoView extends React.Component {
                                         }}/>
                                     </div>
                                 </div>
-                                <div>{state.filterMatchingCount} messages matching</div>
-                                <div>{(state.ranges || []).length} ranges found</div>
+                                <div>
+                                    <span className="filters-box__input-left">
+                                        only from
+                                    </span>
+                                    <div className="filters-box__input-containing">
+                                        <InputMultipleValues values={state.filterUsers} onChange={(values) => {
+                                            //const val = e.currentTarget.value;
+                                            this.setState(state => ({
+                                                ...state,
+                                                filterUsers: values,
+                                            }));
+                                        }}/>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div>{(state.ranges || []).length} moments found ({state.filterMatchingCount} messages)</div>
                             </FlexChild>
                             <FlexChild height={0} grow={1} className="overflow-y-scroll">
                                 {!state.chatlogReady ? (
@@ -320,7 +352,12 @@ class VideoView extends React.Component {
                                 <FlexChild height={0} grow={state.chatVisible ? 3 : 0} className="chat-block overflow-y-scroll">
                                     <div className="fullh">
                                         {state.chatlog && (
-                                            <Chatlog chatlog={state.chatlog} time={state.time} autoscroll={state.autoscroll}/>
+                                            <Chatlog
+                                              chatlog={state.chatlog}
+                                              time={state.time}
+                                              autoscroll={state.autoscroll}
+                                              matches={state.matches}
+                                            />
                                         )}
                                         {/*<pre>{JSON.stringify(state.chatlog, null, '  ')}</pre>*/}
                                     </div>

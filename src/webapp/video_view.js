@@ -211,8 +211,8 @@ class VideoView extends React.Component {
                         <FlexLayout direction="column" className="fullh">
                             <FlexChild className="filters-box" grow={0} shrink={0}>
                                 <div>
-                                    <span className="filters-box__input-name">
-                                        Threshold:
+                                    <span className="filters-box__input-left">
+                                        At least
                                     </span>
                                     <input type="number" className="filters-box__input" placeholder="1" value={state.filterThreshold} onChange={(e) => {
                                         e.preventDefault();
@@ -228,62 +228,59 @@ class VideoView extends React.Component {
                                             filterThreshold: val,
                                         }));
                                     }} />
+                                    <span className="filters-box__input-right">
+                                        {' '}messages
+                                    </span>
                                 </div>
                                 <div>
-                                    <span className="filters-box__input-name">
-                                        Window length:
+                                    <span className="filters-box__input-left">
+                                        in a window of
                                     </span>
-                                    <div className="input-seconds">
-                                        <input type="number" className="filters-box__input" placeholder="1" value={state.windowLength} onChange={(e) => {
-                                            e.preventDefault();
-                                            let val = parseInt(e.currentTarget.value);
-                                            if (isNaN(val)) {
-                                                val = null;
-                                            }
-                                            else {
-                                                val = Math.max(1, val);
-                                            }
-                                            this.setState(state => ({
-                                                ...state,
-                                                windowLength: val,
-                                            }));
-                                        }} />
-                                    </div>
+                                    <input type="number" className="filters-box__input" placeholder="1" value={state.windowLength} onChange={(e) => {
+                                        e.preventDefault();
+                                        let val = parseInt(e.currentTarget.value);
+                                        if (isNaN(val)) {
+                                            val = null;
+                                        }
+                                        else {
+                                            val = Math.max(1, val);
+                                        }
+                                        this.setState(state => ({
+                                            ...state,
+                                            windowLength: val,
+                                        }));
+                                    }} />
+                                    <span className="filters-box__input-right">
+                                        {' '}seconds
+                                    </span>
                                 </div>
                                 <div>
-                                    <span className="filters-box__input-name">
-                                        Rollback:
+                                    <span className="filters-box__input-left">
+                                        starting
                                     </span>
-                                    <div className="input-seconds">
-                                        <input type="number" className="filters-box__input" placeholder="0" value={state.rollback} onChange={(e) => {
-                                            e.preventDefault();
-                                            let val = parseInt(e.currentTarget.value);
-                                            if (isNaN(val)) {
-                                                val = null;
-                                            }
-                                            else {
-                                                val = Math.max(0, val);
-                                            }
-                                            this.setState(state => ({
-                                                ...state,
-                                                rollback: val,
-                                            }));
-                                        }} />
-                                    </div>
+                                    <input type="number" className="filters-box__input" placeholder="0" value={state.rollback} onChange={(e) => {
+                                        e.preventDefault();
+                                        let val = parseInt(e.currentTarget.value);
+                                        if (isNaN(val)) {
+                                            val = null;
+                                        }
+                                        else {
+                                            val = Math.max(0, val);
+                                        }
+                                        this.setState(state => ({
+                                            ...state,
+                                            rollback: val,
+                                        }));
+                                    }} />
+                                    <span className="filters-box__input-right">
+                                        seconds earlier
+                                    </span>
                                 </div>
                                 <div>
-                                    <span className="filters-box__input-name">
-                                        Contains:
+                                    <span className="filters-box__input-left">
+                                        containing
                                     </span>
-                                    {/*<input type="text" value={state.filterValue} placeholder="all" onChange={(e) => {*/}
-                                    {/*    e.preventDefault();*/}
-                                    {/*    const val = e.currentTarget.value;*/}
-                                    {/*    this.setState(state => ({*/}
-                                    {/*        ...state,*/}
-                                    {/*        filterValue: val,*/}
-                                    {/*    }));*/}
-                                    {/*}}/>*/}
-                                    <div className="filters-box__input">
+                                    <div className="filters-box__input-containing">
                                         <InputMultipleValues values={state.filterValues} onChange={(values) => {
                                             //const val = e.currentTarget.value;
                                             this.setState(state => ({
@@ -447,19 +444,30 @@ VideoView = Styled(VideoView)`
         padding: 10px;
     
         .filters-box__input {
-            width: 190px;
+            width: 75px;
             display: inline-block;
         }
-        .filters-box__input-name {
+        .filters-box__input-left {
             display: inline-block;
             width: 115px;
             text-align: right;
-            padding-right: 3px;
+            padding-right: 4px;
             vertical-align: top;
+        }
+        .filters-box__input-right {
+            display: inline-block;
+            padding-left: 4px;
+            vertical-align: top;
+            width: 115px;
+        }
+        .filters-box__input-containing {
+            width: 205px;
+            display: inline-block;
         }
         
         .input-seconds {
             display: inline-block;
+            width: 90px;
             &:after {
                 content: "s";
                 display: inline-block;

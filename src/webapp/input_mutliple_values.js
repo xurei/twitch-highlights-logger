@@ -90,7 +90,9 @@ InputMultipleValues = Styled(InputMultipleValues)`
     margin-left: 2px;
     margin-top: 2px;
     text-align: center;
-    
+  }
+
+  .input-multiple-values__add, .input-multiple-values__remove {
     &:hover {
       background: rgba(255,255,255, 0.15);
       border-radius: 100px;

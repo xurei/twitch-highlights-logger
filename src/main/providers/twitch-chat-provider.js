@@ -236,7 +236,16 @@ function shortenComment(comment) {
         }
     };
 
-    delete out.commenter.__typename;
+    if (out.commenter === null) {
+        out.commenter = {
+          "id": "0",
+          "login": "[deleted_user]",
+          "displayName": "[deleted_user]"
+        };
+    }
+    else {
+        delete out.commenter.__typename;
+    }
     return out;
 }
 

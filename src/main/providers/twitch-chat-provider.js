@@ -12,6 +12,8 @@ class Chatlog {
     
     _fetchedCallbacks = [];
     _fetchProgressCallbacks = [];
+    _fetchErrorCallbacks = [];
+    _hasError = false;
     
     get fetchProgress() {
         return 100 * this._fetchedTime / this._videoMeta.length;
@@ -96,36 +98,51 @@ class Chatlog {
         
         let shouldContinue = true;
         let cursor = null;
-        while (shouldContinue) {
-            const data = await fetchSegment(cursor);
-            console.log(data);
-            const comments = data.comments.edges;
-            const pageInfo = data.comments.pageInfo;
-            comments.forEach(comment => {
-                comment = shortenComment(comment.node);
-                this._comments[this._comments.length] = comment;
-            });
-            //noinspection JSUnresolvedVariable
-            shouldContinue = pageInfo.hasNextPage;
-            //noinspection JSUnresolvedVariable
-            cursor = comments[0].cursor;
-            
-            if (this._comments.length > 0) {
-                this._fetchedTime = this._comments[this._comments.length-1].content_offset_seconds;
-                const progress = this.fetchProgress;
-                this._fetchProgressCallbacks.forEach(callback => {
-                    callback(progress);
+        try {
+            while (shouldContinue) {
+                const data = await fetchSegment(cursor);
+                console.log(data);
+                const comments = data.comments.edges;
+                const pageInfo = data.comments.pageInfo;
+                comments.forEach(comment => {
+                    try {
+                        comment = shortenComment(comment.node);
+                    }
+                    catch(e) {
+                        console.error('comment is malformed');
+                        console.error(JSON.stringify(comment.node, null, '  '))
+                        console.error(e);
+                    }
+                    this._comments[this._comments.length] = comment;
                 });
+                //noinspection JSUnresolvedVariable
+                shouldContinue = pageInfo.hasNextPage;
+                //noinspection JSUnresolvedVariable
+                cursor = comments[0].cursor;
+                
+                if (this._comments.length > 0) {
+                    this._fetchedTime = this._comments[this._comments.length-1].content_offset_seconds;
+                    const progress = this.fetchProgress;
+                    this._fetchProgressCallbacks.forEach(callback => {
+                        callback(progress);
+                    });
+                }
             }
+            this._fetchedTime = this._videoMeta.length;
+        
+            this._fetchProgressCallbacks.forEach(callback => {
+                callback(100);
+            });
+            this._fetchedCallbacks.forEach(callback => {
+                callback();
+            });
         }
-        this._fetchedTime = this._videoMeta.length;
-    
-        this._fetchProgressCallbacks.forEach(callback => {
-            callback(100);
-        });
-        this._fetchedCallbacks.forEach(callback => {
-            callback();
-        });
+        catch (e) {
+            this._hasError = true;
+            this._fetchErrorCallbacks.forEach(callback => {
+                callback();
+            });
+        }
     }
     
     onFetchComplete(/*function()*/ callback) {
@@ -143,6 +160,15 @@ class Chatlog {
         }
         else {
             this._fetchProgressCallbacks.push(callback);
+        }
+    }
+    
+    onFetchError(callback) {
+        if (this._hasError) {
+            callback();
+        }
+        else {
+            this._fetchErrorCallbacks.push(callback);
         }
     }
 }

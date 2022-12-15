@@ -80,7 +80,7 @@ class MainView extends React.Component {
                         <FlexLayout direction="row">
                             <FlexChild grow={0} width={350}>
                                 <div className="overflow-hidden clickable" onClick={() => {
-                                    global.postMessage({ action: 'github_page', data: null }, '*');
+                                    global.postMessage({ action: 'open_page', data: 'https://github.com/xurei/twitch-highlights-logger' }, '*');
                                 }}>
                                     https://github.com/xurei/twitch-highlights-logger
                                 </div>

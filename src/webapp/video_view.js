@@ -17,6 +17,7 @@ class VideoView extends React.Component {
     };
     state = {
         chatlogReady: false,
+        chatlogError: false,
         chatlogProgress: 0,
         chatlog: null,
         matches: {},
@@ -87,6 +88,13 @@ class VideoView extends React.Component {
             this.setState(state => ({
                 ...state,
                 chatlogProgress: progress,
+            }));
+        });
+        global.ipc.on('chatlogError', (event, progress) => {
+            console.error('ERROR WHILE LOADING CHATLOG');
+            this.setState(state => ({
+                ...state,
+                chatlogError: true,
             }));
         });
         
@@ -326,7 +334,26 @@ class VideoView extends React.Component {
                                 <div>{(state.ranges || []).length} moments found ({state.filterMatchingCount} messages)</div>
                             </FlexChild>
                             <FlexChild height={0} grow={1} className="overflow-y-scroll">
-                                {!state.chatlogReady ? (
+                                {!state.chatlogReady ?
+                                state.chatlogError ? (
+                                    <div className="block-padder text-center">
+                                        <br/>
+                                        An error occurred while fetching the chatlog.
+                                        <br/>
+                                        <br/>
+                                        <button className="clickable" onClick={this.handleRetry}>Retry</button>
+                                        <br/>
+                                        <br/>
+                                        If the problem persists, you can <br/>
+                                        <a target="_blank" href="javascript:" onClick={() => {
+                                            global.postMessage({ action: 'open_page', data: 'https://github.com/xurei/twitch-highlights-logger/issues/new/choose' }, '*');
+                                        }}>create an issue on Github</a>
+                                        <br/>{' or '}<br/>
+                                        <a target="_blank" href="javascript:" onClick={() => {
+                                            global.postMessage({ action: 'open_page', data: `https://twitter.com/messages/compose?recipient_id=187525770&text=Hey! I had an issue with Twitch Highlights, I cannot load the chaltog for video ${props.video_id}` }, '*');
+                                        }}>contact the developper on Twitter</a>
+                                    </div>
+                                ) : (
                                     <div className="block-padder">Loading chatlog... {parseInt(state.chatlogProgress)}%</div>
                                 ) : (
                                     <div className="block-padder" style={{height: '100%'}}>
@@ -372,6 +399,16 @@ class VideoView extends React.Component {
                 </div>
             </div>
         );
+    }
+    
+    @autobind
+    handleRetry() {
+        const props = this.props;
+        this.setState(state => ({
+            ...state,
+            chatlogError: false,
+        }));
+        global.postMessage({ action: 'load_chatlog', data: props.video_id }, '*');
     }
     
     @autobind

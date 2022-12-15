@@ -264,9 +264,9 @@ function shortenComment(comment) {
 
     if (out.commenter === null) {
         out.commenter = {
-          "id": "0",
-          "login": "[deleted_user]",
-          "displayName": "[deleted_user]"
+          id: '0',
+          login: '[deleted_user]',
+          displayName: '[deleted_user]'
         };
     }
     else {

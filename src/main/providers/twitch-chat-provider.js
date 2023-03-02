@@ -19,7 +19,7 @@ class Chatlog {
         return 100 * this._fetchedTime / this._videoMeta.length;
     }
     get videoID() {
-        const id = this._videoMeta._id;
+        const id = this._videoMeta.id;
         if (id.charAt(0) === 'v') {
             return id.substr(1);
         }
@@ -75,19 +75,23 @@ class Chatlog {
             else {
                 vars.contentOffsetSeconds = 0;
             }
+            
+            const body = JSON.stringify([{
+                'operationName': 'VideoCommentsByOffsetOrCursor',
+                'variables': vars,
+                'extensions': {
+                    'persistedQuery': {
+                        'version': 1,
+                        'sha256Hash': 'b70a3591ff0f4e0313d126c6a1502d79a1c02baebb288227c582044aa76adf6a'
+                    }
+                }
+            }]);
+            
+            console.log(`Request body : ${body}`);
 
             const resp = await fetch(`https://gql.twitch.tv/gql`, {
                 method: 'POST',
-                body: JSON.stringify([{
-                    'operationName': 'VideoCommentsByOffsetOrCursor',
-                    'variables': vars,
-                    'extensions': {
-                        'persistedQuery': {
-                            'version': 1,
-                            'sha256Hash': 'b70a3591ff0f4e0313d126c6a1502d79a1c02baebb288227c582044aa76adf6a'
-                        }
-                    }
-                }]),
+                body: body,
                 headers: {
                     'Client-ID': clientID,
                     'Accept': 'application/vnd.twitchtv.v5+json; charset=UTF-8',
@@ -276,13 +280,44 @@ function shortenComment(comment) {
 }
 
 async function fetchVideoMeta(videoID) {
-    const resp = await fetch(`https://api.twitch.tv/v5/videos/${videoID}`, {
+    console.log(`Fetching metadata for ${videoID}`);
+    const vars = {
+        channel: '',
+        clipSlug: '',
+        isClip: false,
+        isLive: false,
+        isVodOrCollection: true,
+        vodID: `${videoID}`
+    };
+    
+    const body = JSON.stringify([{
+        'operationName': 'ComscoreStreamingQuery',
+        'variables': vars,
+        'extensions': {
+            'persistedQuery': {
+                'version': 1,
+                'sha256Hash': 'e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01'
+            }
+        }
+    }]);
+    
+    console.log(`Request body : ${body}`);
+
+    const resp = await fetch(`https://gql.twitch.tv/gql`, {
+        method: 'POST',
+        body: body,
         headers: {
             'Client-ID': clientID,
             'Accept': 'application/vnd.twitchtv.v5+json; charset=UTF-8',
         },
     });
-    return await resp.json();
+    
+    const meta = (await resp.json())[0].data.video;
+    meta.length = meta.lengthSeconds;
+    delete meta.lengthSeconds;
+    delete meta.game;
+    
+    return meta;
 }
 
 module.exports = provider;

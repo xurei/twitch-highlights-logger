@@ -8,8 +8,19 @@ import { FlexLayout, FlexChild } from 'xureact/lib/module/components/layout/flex
 
 class MainView extends React.Component {
     state = {
+        newVersion: null,
         currentView: 'select_url',
         twitch_url: '',
+    }
+    componentDidMount() {
+        global.ipc.on('latest_version', (event, release) => {
+            console.log('Latest version:', release.tag_name);
+            console.log('URL:', release.html_url);
+            this.setState(state => ({
+                ...state,
+                newVersion: release,
+            }));
+        });
     }
     render() {
         const props = this.props;
@@ -23,13 +34,16 @@ class MainView extends React.Component {
         
         return (
             <div className={props.className}>
-                {props.release && props.release.new_version && (
+                {state.newVersion && (
                     <div className="new-version">
                         <strong>A new version of Twitch Highlights is available !</strong>
                         {' '}
-                        {props.release && props.release.tag_name}
+                        {state.newVersion.tag_name}
                         {' '}
-                        <a href={props.release}>Download</a>
+                        <a href={state.newVersion.html_url} onClick={(e) => {
+                            e.preventDefault();
+                            global.postMessage({ action: 'open_page', data: state.newVersion.html_url }, '*');
+                        }}>Download</a>
                     </div>
                 )}
                 <div className="main-content">
@@ -157,7 +171,7 @@ MainView = Styled(MainView)`
   }
   
   .new-version {
-    background: #D17000;
+    background: #EC7DE5;
     position: relative;
     padding: 10px 40px;
     

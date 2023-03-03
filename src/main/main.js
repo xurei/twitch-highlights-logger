@@ -87,8 +87,8 @@ const App = {
                         if (semver.gt(release.tag_name.substring(1), pkg.version)) {
                             release.new_version = true;
                             console.log(`NEW VERSION ${release.tag_name}`);
+                            mainWindow.webContents.send('latest_version', release);
                         }
-                        mainWindow.webContents.send('latest_version', release);
                     }
                     return;
                 })

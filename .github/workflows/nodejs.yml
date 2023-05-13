@@ -14,6 +14,8 @@ jobs:
       - run: rm -rf build || true; mkdir build
       - run: npm run build:dependencies
       - run: npm run build
+        env:
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
 
   release-linux:
     runs-on: ubuntu-latest
@@ -25,12 +27,13 @@ jobs:
       - run: rm -rf build || true; mkdir build
       - run: npm run build:dependencies
       - run: npm run build
+        env:
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
       - run: npm run obfuscate
       - run: npm run package:linux
         env:
           # This token is provided by Actions, you do not need to create your own token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           USE_HARD_LINKS: false
 
   release-windows:
@@ -44,12 +47,13 @@ jobs:
       - run: mkdir build
       - run: npm run build:dependencies
       - run: npm run build
+        env:
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
       - run: npm run obfuscate
       - run: npm run package:windows
         env:
           # This token is provided by Actions, you do not need to create your own token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           USE_HARD_LINKS: false
 
   release-macos:
@@ -58,16 +62,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      #- run: echo "${{ github.ref }}"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       - run: npm ci
       - run: npm i --save-dev dmg-license
       - run: mkdir build
       - run: npm run build:dependencies
       - run: npm run build
+        env:
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
       - run: npm run obfuscate
       - run: npm run package:macos
         env:
           # This token is provided by Actions, you do not need to create your own token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           USE_HARD_LINKS: false

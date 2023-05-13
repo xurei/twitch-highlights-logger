@@ -1,8 +1,8 @@
 import process from 'node:process';
 import storage from 'electron-json-storage';
 import fetch from 'node-fetch';
+import {twitchClientId} from './twitch-client-id';
 
-const clientID = 'kimne78kx3ncx6brgo4mv6wki5h1ko'; // From Twitch website (2022-02-09)
 const payloadVersion = 2; // Version of the data to be compared with the cache. If different, a refetch is performed
 
 class Chatlog {
@@ -93,7 +93,7 @@ class Chatlog {
                 method: 'POST',
                 body: body,
                 headers: {
-                    'Client-ID': clientID,
+                    'Client-ID': twitchClientId,
                     'Accept': 'application/vnd.twitchtv.v5+json; charset=UTF-8',
                 },
             });
@@ -307,7 +307,7 @@ async function fetchVideoMeta(videoID) {
         method: 'POST',
         body: body,
         headers: {
-            'Client-ID': clientID,
+            'Client-ID': twitchClientId,
             'Accept': 'application/vnd.twitchtv.v5+json; charset=UTF-8',
         },
     });

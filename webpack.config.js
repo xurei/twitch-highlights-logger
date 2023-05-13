@@ -81,7 +81,7 @@ const config = {
             //FIXME this disables entirely the React Devtool, cannot stay like this
             //'__REACT_DEVTOOLS_GLOBAL_HOOK__': '({ isDisabled: true })'
         }),
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.IgnorePlugin({ resourceRegExp: /^\.\/locale$/, contextRegExp: /moment$/ }),
         new HtmlWebpackPlugin({
             title: 'Twitch Highlights',
             hash: true,

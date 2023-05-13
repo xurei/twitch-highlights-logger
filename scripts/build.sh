@@ -6,7 +6,6 @@ myrealpath() {
 }
 
 BASEPATH=$(myrealpath $(dirname $0))
-export NODE_OPTIONS=--openssl-legacy-provider
 
 if [[ $1 != '' ]]; then
 	echo "Building $1 ONLY"

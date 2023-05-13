@@ -12,9 +12,6 @@
     <a href="https://github.com/xurei/twitch-highlights-logger/releases/latest" target="_blank">
       <img src="https://img.shields.io/github/release/xurei/twitch-highlights-logger.svg" alt="Release" />
     </a>
-    <a href="https://david-dm.org/xurei/twitch-highlights-logger" target="_blank">
-      <img src="https://david-dm.org/xurei/twitch-highlights-logger.svg" alt="Dependencies" />
-    </a>
 </div>
 <div align="center">
     <a href="https://github.com/xurei/twitch-highlights-logger/blob/master/LICENSE">

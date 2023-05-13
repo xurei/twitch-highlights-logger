@@ -5,13 +5,22 @@ import * as pkg from '../../package.json';
 import { SelectUrlView } from './select_url_view';
 import { VideoView } from './video_view';
 import { FlexLayout, FlexChild } from 'xureact/lib/module/components/layout/flex-layout';
+import { OverlayDonate } from './overlay-donate';
+import {IconDonate} from './icon-donate';
 
 class MainView extends React.Component {
     state = {
         newVersion: null,
         currentView: 'select_url',
         twitch_url: '',
+        overlayDonateVisible: false,
     }
+    
+    constructor(props) {
+        super(props);
+        this.openDonateOverlay = this.openDonateOverlay.bind(this);
+    }
+    
     componentDidMount() {
         global.ipc.on('latest_version', (event, release) => {
             console.log('Latest version:', release.tag_name);
@@ -34,6 +43,14 @@ class MainView extends React.Component {
         
         return (
             <div className={props.className}>
+                {state.overlayDonateVisible && (
+                  <OverlayDonate
+                    onClose={() => this.setState(state => ({
+                        ...state,
+                        overlayDonateVisible: false,
+                    }))}
+                  />
+                )}
                 {state.newVersion && (
                     <div className="new-version">
                         <strong>A new version of Twitch Highlights is available !</strong>
@@ -69,6 +86,14 @@ class MainView extends React.Component {
                                     {state.twitch_url}
                                 </div>
                             </FlexChild>
+                            <FlexChild grow={0} width={128}>
+                                {state.currentView !== 'select_url' && (
+                                    <button className="donate-btn hollow hollow-white" onClick={this.openDonateOverlay}>
+                                        <IconDonate color="inherit" size={23} />{' '}
+                                        <span>Donate</span>
+                                    </button>
+                                )}
+                            </FlexChild>
                             <FlexChild grow={0} width={64}>
                                 <div style={{paddingRight: 5, paddingLeft: 5, paddingTop: 10, background: '#282828', lineHeight: 0 }}>
                                     <img src="300x300.png" alt="Logo"/>
@@ -78,13 +103,16 @@ class MainView extends React.Component {
                     </div>
                     <div className="content">
                         {state.currentView === 'select_url' && (
-                            <SelectUrlView onSelectUrl={(url) => {
-                                this.setState((state) => ({
-                                    ...state,
-                                    currentView: 'video',
-                                    twitch_url: url,
-                                }));
-                            }}/>
+                            <SelectUrlView
+                                onSelectUrl={(url) => {
+                                    this.setState((state) => ({
+                                        ...state,
+                                        currentView: 'video',
+                                        twitch_url: url,
+                                    }));
+                                }}
+                                onDonateClick={this.openDonateOverlay}
+                            />
                         )}
                         {state.currentView === 'video' && (
                             <VideoView video_id={video_id}/>
@@ -111,6 +139,13 @@ class MainView extends React.Component {
                 </div>
             </div>
         );
+    }
+    
+    openDonateOverlay() {
+        this.setState(state => ({
+            ...state,
+            overlayDonateVisible: true,
+        }));
     }
 }
 
@@ -179,6 +214,11 @@ MainView = Styled(MainView)`
       color: #320;
       text-decoration: underline;
     }
+  }
+  
+  .donate-btn {
+      padding: 4px 8px;
+      margin-top: 14px;
   }
 }
 `;

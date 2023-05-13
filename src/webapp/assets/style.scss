@@ -69,9 +69,14 @@ a:hover {
 }
 
 button {
+  svg, span {
+    vertical-align: middle;
+  }
+
   &.cta {
     background: $main-color;
     color: #fff;
+    fill: #fff;
     border-radius: 5px;
     border: none;
     padding: 8px 20px;
@@ -87,7 +92,48 @@ button {
       outline: none;
     }
     &:active {
-      margin-top: 1px;
+      transform: translate(0, 2px);
+      box-shadow: none;
+    }
+  }
+  &.hollow {
+    background: transparent;
+    color: $main-color;
+    fill: $main-color;
+    border-radius: 5px;
+    border: solid 1px $main-color;
+    padding: 8px 20px;
+    font-size: 20px;
+    //border-bottom: solid 1px $main-color-darker;
+    box-shadow: 0 2px 0 0 $main-color-darker;
+
+    &:hover {
+      border-color: $main-color-darker;
+      background: $main-color-dark;
+      color: #fff;
+      fill: #fff;
+      cursor: pointer;
+    }
+    &:focus {
+      outline: none;
+    }
+    &:active {
+      transform: translate(0, 2px);
+      box-shadow: none;
+    }
+  }
+
+  &.hollow-white {
+    color: #eee;
+    fill: $main-color;
+    border-color: #ccc;
+    box-shadow: 0 2px 0 0 #b0b0b0;
+
+    &:hover {
+      border-color: $main-color-darker;
+      box-shadow: 0 2px 0 0 $main-color-darker;
+    }
+    &:active {
       box-shadow: none;
     }
   }
@@ -116,4 +162,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 .text-center {
   text-align: center;
+}
+
+.d-inline-block {
+  display: inline-block;
 }

@@ -39,7 +39,7 @@
   },
   "private": true,
   "dependencies": {
-    "@babel/runtime": "^7.12.18",
+    "@babel/runtime": "^7.21.5",
     "@babel/runtime-corejs3": "^7.12.18",
     "core-js": "^3.9.0",
     "debug": "^4.3.1",
